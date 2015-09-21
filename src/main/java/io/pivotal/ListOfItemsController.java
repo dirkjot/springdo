@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 public class ListOfItemsController {
 
-    @RequestMapping("/")
+    @RequestMapping("/resource/")
     List simpleminded() {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         Map<String, String> map1 = new HashMap<String, String>();

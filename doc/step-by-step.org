@@ -11,3 +11,54 @@ Starting with a empty pivotal tracker project with stories and such,
 we build a simple To Do list app in Spring Framework + MVC, using
 spring boot and AngularJS for the front end.
 
+* Starting the project
+
+** commit 9b8e26267780faff87e6313db3c462965d3a916e
+- Github project on https://github.com/dirkjot/springdo.git
+- Cleaned up tracker project and stored it in a csv file (not on
+  github yet)
+- Started spring boot via http://start.spring.io
+- `gradle wrapper`
+
+
+
+** commit 2c695d6db9ce111298744a1d51aea8f0f3b33a64
+- `gradle idea`   , this sets up the intellij project for you.
+- `idea . ` (from project directory)
+- added the spring facet to the top module
+- we are now using eclipse?? settings which means the project does not
+  go into the `.idea` directory
+- similary, build does not only go into `build` but also into `out`.
+- this compiles and runs, showing an generic whitepage error on localhost:8080/
+- create a run/debug configuration by right clicking on the
+  spriongdoApplication.java file and choosing run, then choose the
+  option with the green leaf icon (spring).   See screenshot.
+
+
+
+** commit bea91975d47397339ef5a3e655ca1b2378c5a941
+
+we pulled in angular + bootstrap.   following advice  from spriong
+tutorial #2 (refer here),  we created our own js/css main file.   this
+used wro4j in some intricate way, see springbeachproject. essentially,
+it combines and minifies all js/css.
+
+** commit ce2df0ddda289dc1c5d33b6445fe20bc80f39d42
+
+fixed the first user story, but at json level only.  ie / returns a
+json array of two todo items. 
+
+
+
+
+**  screenshots
+
+project structure settings
+[[./screenshots/project-structure-settings-1.png]]
+
+run/debug configuration 
+[[./screenshots/run-debug-config-1.png]]
+
+
+
+

@@ -45,7 +45,7 @@ public class ListOfItemsControllerTest {
         // id1 / title: Go for a swim  / Content:  Go swimming on Monday night
         // id2 / title: Visit farmer's market / Content: Buy dairy and eggs at farmers market on Wednesday
 
-        mvc.perform(get("/"))
+        mvc.perform(get("/resource/"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 //.andExpect(view().name("list_of_items"))
