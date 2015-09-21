@@ -1,0 +1,13 @@
+* Creating a To Do list with the Sping Framework
+
+
+** Overview
+
+This is not a full step by step tutorial, but some notes that could
+one day be expanded to be a tutorial.  So it should be complete, but
+also fast to write and probably terse.
+
+Starting with a empty pivotal tracker project with stories and such,
+we build a simple To Do list app in Spring Framework + MVC, using
+spring boot and AngularJS for the front end.
+
