@@ -2,6 +2,7 @@ package io.pivotal;
 
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -25,6 +27,15 @@ public class ListOfItemsControllerTest {
 
 
     private MockMvc mvc;
+
+
+
+    @Autowired
+    ItemRepository itemRepository;
+
+//    ListOfItemsControllerTest(ItemRepository itemRepository) {
+//        this.itemRepository = itemRepository;
+//    }
 
     @Autowired
     private WebApplicationContext context;
@@ -45,7 +56,7 @@ public class ListOfItemsControllerTest {
         // id1 / title: Go for a swim  / Content:  Go swimming on Monday night
         // id2 / title: Visit farmer's market / Content: Buy dairy and eggs at farmers market on Wednesday
 
-        mvc.perform(get("/resource/"))
+        mvc.perform(get("/resource/dummylist/"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 //.andExpect(view().name("list_of_items"))
@@ -56,6 +67,23 @@ public class ListOfItemsControllerTest {
                 .andExpect(jsonPath("$[1].title", containsString("market")))
                 .andExpect(jsonPath("$[0].content", containsString("swimming on Monday")))
                 .andExpect(jsonPath("$[1].content", containsString("dairy and eggs")));
+    }
+
+    @Test
+    public void whenItemIsCheckedAsDoneModelIsUpdated() throws Exception {
+        Item item = new Item("Fake Todo", "Do Lots of stuff");
+        // post item into db here
+        itemRepository.save(item);
+        assertEquals(item.id, 1);
+
+        mvc.perform(post("/resource/done/1/yes/"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        // retrieve item from db,
+        Item newItem = itemRepository.findOne(item.id);
+        // check that done == yes
+        assertEquals(item.done, "no");
+        assertEquals(newItem.done, "yes");
     }
 
 }

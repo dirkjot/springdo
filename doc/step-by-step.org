@@ -48,6 +48,18 @@ it combines and minifies all js/css.
 fixed the first user story, but at json level only.  ie / returns a
 json array of two todo items. 
 
+** commit 2285a53a1a0267e14078c0553f5c41ef3ffed4f2
+
+added some simple angular structure to iterate over the list of todo
+items (using ng-repeat).  Move the json to `/resource/` . 
+
+** commit 4c90cc917465c03c649ce0c709a8f309261c87a8
+
+created a link with github as follows:
+- go to your profile page on tracker
+- find api key (long hex number)
+- go to github, project setttings, webhooks and services
+- under services, choose pivotal tracker and enter api key.  
 
 
 
@@ -58,6 +70,7 @@ project structure settings
 
 run/debug configuration 
 [[./screenshots/run-debug-config-1.png]]
+
 
 
 
