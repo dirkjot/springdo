@@ -18,11 +18,6 @@ public class ListOfItemsController {
     @Autowired
     ItemRepository itemRepository;
 
-    //@Autowired
-    //ListOfItemsController(ItemRepository itemRepository) {
-    //    this.itemRepository = itemRepository;
-    //}
-
     @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
     List listOfItems() {
         Iterable<Item> iterable = itemRepository.findAll();
@@ -51,15 +46,51 @@ public class ListOfItemsController {
         return result;
     }
 
-    @RequestMapping(value="/resource/done/{id}/{state}/", method= RequestMethod.POST)
-    String postDoneUpdate(@PathVariable long id, @PathVariable String state) {
+    /**
+     * Change the 'done' flag on a todo item
+     * @param id: of todo item
+     * @param done:  yes or no
+     * @return ok message
+     */
+    @RequestMapping(value="/resource/done/{id}/{done}/", method=RequestMethod.POST)
+    String postDoneUpdate(@PathVariable long id, @PathVariable String done) {
         Item item = itemRepository.findOne(id);
-        if (state.equals("yes") || state.equals("no")) {
-            item.done = state;
+        if (done.equals("yes") || done.equals("no")) {
+            item.done = done;
         } else {
-          System.out.println("Invalid argument to postDoneUpdate:  " + state);
+          System.out.println("Invalid argument to postDoneUpdate:  " + done);
         }
         itemRepository.save(item);
         return "[\"ok\"]";
     }
+
+    // post('/resource/save/<id>/title/content/done/')
+
+    /**
+     * Save a todo item
+     * @param id
+     * @param title
+     * @param content
+     * @param done
+     * @return
+     */
+    @RequestMapping(value="/resource/save/{id}/{title}/{content}/{done}/", method=RequestMethod.POST)
+    String postSaveUpdate(@PathVariable long id, @PathVariable String title, @PathVariable String content, @PathVariable String done) {
+        Item item = itemRepository.findOne(id);
+        if (done.equals("yes") || done.equals("no")) {
+            item.done = done;
+        } else {
+            System.out.println("Invalid argument to postSaveUpdate:  " + done);
+        }
+        item.title = title;
+        item.content = content;
+        itemRepository.save(item);
+        return "[\"ok\"]";
+    }
+
+
+
+
+    // post('/resource/new/title/content/done/')
+
 }

@@ -29,14 +29,14 @@ angular.module('index', []).controller('home', function($scope, $http) {
 		$scope.editorEnabled = true;
 		item.titleField = item.title;
 		item.contentField = item.content;
+		$scope.currentEditItem = item.id;
 	};
 
 	$scope.saveedit = function (item) {
 		item.title = item.titleField;
 		item.content = item.contentField;
 		$scope.editorEnabled = false;
-		// TODO post this stuff
-		// post('/resource/save/<id>/title/content/done/')
+		$http.post('/resource/save/' + item.id + '/' + item.title + '/' + item.content + '/' + item.done + '/');
 
 	};
 
