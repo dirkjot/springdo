@@ -19,7 +19,7 @@ public class SpringdoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         // save a couple of customers
-        itemRepository.save(new Item("Jack", "Bauer"));
+        itemRepository.save(new Item("Jack", "Bauer lorem ipsum and a very long story indeed. Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed. "));
         itemRepository.save(new Item("Chloe", "O'Brian"));
         itemRepository.save(new Item("Kim", "Bauer"));
         itemRepository.save(new Item("David", "Palmer"));

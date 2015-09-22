@@ -2,7 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d49f7c8c-8033-48f2-9c7f-5fcdd6f11d62" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doc/springdo visualization 1.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/io/pivotal/ItemRepository.java" afterPath="$PROJECT_DIR$/src/main/java/io/pivotal/ItemRepository.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java" afterPath="$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java" afterPath="$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java" afterPath="$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/static/js/index.js" afterPath="$PROJECT_DIR$/src/main/resources/static/js/index.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/springdo.iws" afterPath="$PROJECT_DIR$/springdo.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/step-by-step.org" afterPath="$PROJECT_DIR$/doc/step-by-step.org" />
     </list>
@@ -129,34 +135,10 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#447#448#0" expanded="true" />
-                <element signature="e#517#518#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Item.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/Item.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="25" column="25" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
+              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-29.74074">
-              <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -164,41 +146,19 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/static/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-29.655172">
-              <caret line="43" column="26" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
+            <state vertical-scroll-proportion="-8.275862">
+              <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="application.properties" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="-10.37037">
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="springdo.iws" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/springdo.iws">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.85219705">
-              <caret line="32" column="29" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ListOfItemsControllerTest.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="73" column="60" selection-start-line="73" selection-start-column="60" selection-end-line="73" selection-end-column="60" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -207,25 +167,37 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="54" column="60" selection-start-line="54" selection-start-column="60" selection-end-line="54" selection-end-column="60" />
+              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#560#561#0" expanded="true" />
-                <element signature="e#612#613#0" expanded="true" />
-                <element signature="e#1072#1093#0" expanded="true" />
-                <element signature="e#1143#1159#0" expanded="true" />
-                <element signature="e#1404#1420#0" expanded="true" />
+                <element signature="e#960#981#0" expanded="true" />
+                <element signature="e#1031#1047#0" expanded="true" />
+                <element signature="e#1292#1308#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/index.js">
+      <file leaf-file-name="ItemRepository.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/ItemRepository.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-              <folding />
+              <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ListOfItemsControllerTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="1.4231884">
+              <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -705,14 +677,15 @@
         <option value="$PROJECT_DIR$/src/main/resources/static/hello-angular.html" />
         <option value="$PROJECT_DIR$/src/test/java/io/pivotal/TaskControllerTest.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
-        <option value="$PROJECT_DIR$/src/main/resources/static/js/index.js" />
+        <option value="$PROJECT_DIR$/src/main/java/io/pivotal/Item.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
+        <option value="$PROJECT_DIR$/springdo.iws" />
+        <option value="$PROJECT_DIR$/src/main/resources/static/index.html" />
+        <option value="$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java" />
         <option value="$PROJECT_DIR$/src/main/java/io/pivotal/ItemRepository.java" />
         <option value="$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java" />
-        <option value="$PROJECT_DIR$/src/main/java/io/pivotal/Item.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/static/js/index.js" />
         <option value="$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/static/index.html" />
-        <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
       </list>
     </option>
   </component>
@@ -965,7 +938,7 @@
       <recent name="$PROJECT_DIR$/src/main/resources/static/js" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.SpringdoApplication">
+  <component name="RunManager" selected="JUnit.ListOfItemsControllerTest">
     <configuration default="false" name="SpringdoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="io.pivotal.SpringdoApplication" />
@@ -1031,6 +1004,32 @@
       <option name="MAIN_CLASS_NAME" value="io.pivotal.ListOfItemsControllerTest" />
       <option name="METHOD_NAME" value="whenItemIsCheckedAsDoneModelIsUpdated" />
       <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="false" name="ListOfItemsControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="io.pivotal.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="springdo" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="io.pivotal" />
+      <option name="MAIN_CLASS_NAME" value="io.pivotal.ListOfItemsControllerTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1297,18 +1296,20 @@
     <configuration default="true" type="osgi.bnd.run" factoryName="Test Launcher (JUnit)">
       <method />
     </configuration>
-    <list size="4">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Spring Boot.SpringdoApplication" />
       <item index="1" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest.whenDefaultPlaceholdersLoadedTwoTasksShouldShow" />
       <item index="2" class="java.lang.String" itemvalue="Gradle.springdo [build]" />
       <item index="3" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest.whenItemIsCheckedAsDoneModelIsUpdated" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest" />
     </list>
     <recent_temporary>
-      <list size="4">
-        <item index="0" class="java.lang.String" itemvalue="Spring Boot.SpringdoApplication" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest.whenItemIsCheckedAsDoneModelIsUpdated" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest.whenDefaultPlaceholdersLoadedTwoTasksShouldShow" />
-        <item index="3" class="java.lang.String" itemvalue="Gradle.springdo [build]" />
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest" />
+        <item index="1" class="java.lang.String" itemvalue="Spring Boot.SpringdoApplication" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest.whenItemIsCheckedAsDoneModelIsUpdated" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.ListOfItemsControllerTest.whenDefaultPlaceholdersLoadedTwoTasksShouldShow" />
+        <item index="4" class="java.lang.String" itemvalue="Gradle.springdo [build]" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -1329,7 +1330,7 @@
       <workItem from="1442859996068" duration="203000" />
       <workItem from="1442860202091" duration="4414000" />
       <workItem from="1442868672280" duration="22000" />
-      <workItem from="1442868723113" duration="10871000" />
+      <workItem from="1442868723113" duration="14711000" />
     </task>
     <task id="LOCAL-00001" summary="Working version, with whitelabel error page and idea set up.">
       <created>1442861264206</created>
@@ -1355,11 +1356,17 @@
       <option name="project" value="LOCAL" />
       <updated>1442880191921</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added some simple formatting to make it look nicer.  There is code in index.html (commented out) which allows you to test the main page by itself, without a server.&#10;">
+      <created>1442883645913</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1442883645914</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15510000" />
+    <option name="totallyTimeSpent" value="19350000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1381,10 +1388,10 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32895815" sideWeight="0.50250894" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.43138686" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.47591242" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28613138" sideWeight="0.49749103" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962668" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297785" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919708" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32895815" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13820492" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -1420,21 +1427,16 @@
     <MESSAGE value="Added angular and bootstrap, with a test page under /hello-angular.html&#10;" />
     <MESSAGE value="Further solved the last story , now with more or less pretty page at /   .  The json is served at /resource/&#10;[Finishes #103828032]" />
     <MESSAGE value="[Finishes #103828034] Refactored placeholder data to be created on application boot. Created Item model and added checkboxes. Selection of checkboxes is posted to the controller and persisted." />
-    <option name="LAST_COMMIT_MESSAGE" value="[Finishes #103828034] Refactored placeholder data to be created on application boot. Created Item model and added checkboxes. Selection of checkboxes is posted to the controller and persisted." />
+    <MESSAGE value="Added some simple formatting to make it look nicer.  There is code in index.html (commented out) which allows you to test the main page by itself, without a server.&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added some simple formatting to make it look nicer.  There is code in index.html (commented out) which allows you to test the main page by itself, without a server.&#10;" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java</url>
-          <line>76</line>
-          <properties />
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java</url>
-          <line>61</line>
+          <line>57</line>
           <properties />
           <option name="timeStamp" value="3" />
         </line-breakpoint>
@@ -1458,8 +1460,6 @@
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#447#448#0" expanded="true" />
-            <element signature="e#517#518#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1493,7 +1493,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="1" selection-start-line="0" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1522,11 +1522,9 @@
           <caret line="28" column="24" selection-start-line="28" selection-start-column="24" selection-end-line="28" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#560#561#0" expanded="true" />
-            <element signature="e#612#613#0" expanded="true" />
-            <element signature="e#1072#1093#0" expanded="true" />
-            <element signature="e#1143#1159#0" expanded="true" />
-            <element signature="e#1404#1420#0" expanded="true" />
+            <element signature="e#960#981#0" expanded="true" />
+            <element signature="e#1031#1047#0" expanded="true" />
+            <element signature="e#1292#1308#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1537,8 +1535,6 @@
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#447#448#0" expanded="true" />
-            <element signature="e#517#518#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1572,7 +1568,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="1" selection-start-line="0" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1601,11 +1597,9 @@
           <caret line="28" column="24" selection-start-line="28" selection-start-column="24" selection-end-line="28" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#560#561#0" expanded="true" />
-            <element signature="e#612#613#0" expanded="true" />
-            <element signature="e#1072#1093#0" expanded="true" />
-            <element signature="e#1143#1159#0" expanded="true" />
-            <element signature="e#1404#1420#0" expanded="true" />
+            <element signature="e#960#981#0" expanded="true" />
+            <element signature="e#1031#1047#0" expanded="true" />
+            <element signature="e#1292#1308#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1616,8 +1610,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#447#448#0" expanded="true" />
-            <element signature="e#517#518#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1653,16 +1645,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/ItemRepository.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.14736842">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/a6c32b40bf3d76eca54e3c601e5d1470c86fcdfa/junit-4.12-sources.jar!/org/junit/internal/runners/model/ReflectiveCallable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.2736842">
@@ -1694,7 +1676,7 @@
         <state vertical-scroll-proportion="0.25263157">
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1707,55 +1689,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java">
+    <entry file="file://$PROJECT_DIR$/springdo.iws">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#447#448#0" expanded="true" />
-            <element signature="e#517#518#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="54" column="60" selection-start-line="54" selection-start-column="60" selection-end-line="54" selection-end-column="60" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#560#561#0" expanded="true" />
-            <element signature="e#612#613#0" expanded="true" />
-            <element signature="e#1072#1093#0" expanded="true" />
-            <element signature="e#1143#1159#0" expanded="true" />
-            <element signature="e#1404#1420#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="73" column="60" selection-start-line="73" selection-start-column="60" selection-end-line="73" selection-end-column="60" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/static/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-29.655172">
-          <caret line="43" column="26" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
+        <state vertical-scroll-proportion="0.4366079">
+          <caret line="26" column="46" selection-start-line="26" selection-start-column="46" selection-end-line="26" selection-end-column="46" />
           <folding />
         </state>
       </provider>
@@ -1768,11 +1705,62 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/springdo.iws">
+    <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/SpringdoApplication.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.85219705">
-          <caret line="32" column="29" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="29" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/static/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.275862">
+          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/ItemRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/io/pivotal/ListOfItemsController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#960#981#0" expanded="true" />
+            <element signature="e#1031#1047#0" expanded="true" />
+            <element signature="e#1292#1308#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/static/js/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.37037">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/io/pivotal/ListOfItemsControllerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.4231884">
+          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

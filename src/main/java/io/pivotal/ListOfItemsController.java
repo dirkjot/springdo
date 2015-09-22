@@ -15,12 +15,8 @@ import java.util.*;
 @RestController
 public class ListOfItemsController {
 
-    ItemRepository itemRepository;
-
     @Autowired
-    ListOfItemsController(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+    ItemRepository itemRepository;
 
     @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
     List listOfItems() {

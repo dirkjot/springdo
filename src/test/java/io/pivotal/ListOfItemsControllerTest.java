@@ -74,9 +74,8 @@ public class ListOfItemsControllerTest {
         Item item = new Item("Fake Todo", "Do Lots of stuff");
         // post item into db here
         itemRepository.save(item);
-        assertEquals(item.id, 1);
 
-        mvc.perform(post("/resource/done/1/yes/"))
+        mvc.perform(post("/resource/done/"+item.id+"/yes/"))
                 .andDo(print())
                 .andExpect(status().isOk());
         // retrieve item from db,

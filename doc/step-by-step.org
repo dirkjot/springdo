@@ -71,6 +71,42 @@ created a link with github as follows:
 - found out how to do db init at startup, see snippet below
 
 
+** commit 0a69691b627761b56237bc4bb7ac7b9b57d62706
+    
+Added some simple formatting to make it look nicer.  There is code in
+index.html (commented out) which allows you to test the main page by
+itself, without a server.
+
+
+** working on show/hide content
+
+
+what we learned about angular:
+- in angular, things can be hidden/shown and toggled with ng-show and
+  ng-hide directives, these can go on anything (like a <dt> in our
+  case) :  <dt ng-show="toggle[item.id]"
+- the ng-show has an argument which is the model variable on which it
+  will show, var == true -> tag shows
+- the argument is normally a variable, but can also be an array.  we
+  have multiple todo items and only one toggle function, so we use an
+  array with the item.id
+- inside the ng.show, you do not need the {{item.id}} or $scope.
+- we do need to set up the toggle array in our model (index.js):
+  $scope.toggle = [];
+- all array items are undefined at first, but that is fine if we want
+  our item hidden: ng-show(undefined) will make things hidden.
+- to toggle, we need a test that sets undefined and false to true, and
+  true to false: $scope.toggle[myvar] = $scope.toggle[myvar] === true
+  ? false : true;};
+- the state change is started by a click on the title, you can connect
+  an ng-click to ANY item (does not have to be button).
+  <dt ng-click="toggleCustom(item.id)">Our ToDo title here</dt>
+
+
+
+docs used:
+https://docs.angularjs.org/api/ng/directive/ngShow
+http://geniuscarrier.com/ng-toggle-in-angularjs/
 
 
 **  screenshots
