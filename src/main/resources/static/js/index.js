@@ -11,11 +11,15 @@ angular.module('index', []).controller('home', function($scope, $http) {
 
 	// hiding showing content
 	$scope.content = [];
+	$scope.contentField = [];
+	$scope.titleField = [];
+
 	$scope.toggleContent = function(myvar) {
 		//console.log($scope.content[myvar]);
+		$scope.editorEnabled = false;
 		for (var key in $scope.content) {
 			if (key != myvar) {
-			$scope.content[key] = false; }}
+				$scope.content[key] = false; }}
 		$scope.content[myvar] = !$scope.content[myvar]; };
 
 
@@ -23,18 +27,21 @@ angular.module('index', []).controller('home', function($scope, $http) {
 	$scope.editorEnabled = false;
 
 	$scope.goedit = function (item) {
-
 		$scope.editorEnabled = true;
-		$scope.editableTitle = $scope.item.title;
-		$scope.editableContent = $scope.item.content;
+		$scope.titleField[item.id] = item.title;
+		$scope.contentField[item.id] = item.content;
+		$scope.currentEditItem = item.id;
 	};
 
 	$scope.saveedit = function (item) {
-		$scope.item.title = $scope.editableTitle;
-		$scope.item.content = $scope.editableContent;
+		//console.log([item.title, $scope.editableTitle]);
+		item.title = $scope.titleField[item.id];
+		item.content = $scope.contentField[item.id];
+		//console.log([item.title, $scope.editableTitle]);
 		$scope.editorEnabled = false;
 		// TODO post this stuff
 	};
+
 
 
 });
