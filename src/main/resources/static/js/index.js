@@ -38,9 +38,7 @@ angular.module('index', []).controller('home', function($scope, $http) {
 		item.title = item.titleField;
 		item.content = item.contentField;
 		$scope.editorEnabled = false;
-		// TODO post this stuff
-		// post('/resource/save/<id>/title/content/done/')
-		// post('/resource/new/title/content/done/')
+		$http.post('/resource/save/' + item.id + '/' + item.title + '/' + item.content + '/' + item.done + '/');
 
 	};
 
