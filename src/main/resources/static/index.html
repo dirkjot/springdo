@@ -3,11 +3,7 @@
 <head>
     <title>Hello AngularJS</title>
     <link href="css/angular-bootstrap.css" rel="stylesheet">
-    <style type="text/css">
-        [ng\:cloak], [ng-cloak], .ng-cloak {
-            display: none !important;
-        }
-    </style>
+    <link href="css/local.css" rel="stylesheet">
 </head>
 
 <body ng-app="index">
@@ -21,7 +17,7 @@
                     <!-- not editing: -->
                     <form name="form{{item.id}}" ng-hide="editorEnabled && item.id == currentEditItem">
                         <div class="col-md-6">
-                            <div ng-click="toggleContent(item.id)">{{item.title}} ({{item.id}})</div>
+                            <div ng-click="toggleContent(item.id)"><b>{{item.title}}</b></div>
                             <div ng-show="content[item.id] && !editorEnabled">
                                 <p>{{item.content}}</p>
                                 <span class="glyphicon glyphicon-pencil" ng-click="goedit(item)"></span>
@@ -36,12 +32,13 @@
                     </form>
                     <!-- editing: -->
                     <div ng-show="content[item.id] && editorEnabled">
-                        <form name="formedit{{item.id}}"  ng-submit="saveedit(item)">
-                            <input ng-model="titleField[item.id]">
-                            <input ng-model="contentField[item.id]">
-                            <input type="submit" id="submit" value="Submit">
+                        <form name="formedit{{item.id}}"  ng-submit="saveedit(item)" role="form">
+                            <div class="form-group">
+                                <input type="text" ng-model="item.titleField" class="form-control"><br>
+                                <textarea type="text" ng-model="item.contentField"  class="form-control"></textarea><br>
+                                <input type="submit" id="submit" value="Submit"   class="form-control btn btn-warning">
+                            </div>
                         </form>
-
                     </div>
 
                 </div>

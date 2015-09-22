@@ -26,20 +26,22 @@ angular.module('index', []).controller('home', function($scope, $http) {
 	// editing content
 	$scope.editorEnabled = false;
 
+
 	$scope.goedit = function (item) {
 		$scope.editorEnabled = true;
-		$scope.titleField[item.id] = item.title;
-		$scope.contentField[item.id] = item.content;
+		item.titleField = item.title;
+		item.contentField = item.content;
 		$scope.currentEditItem = item.id;
 	};
 
 	$scope.saveedit = function (item) {
-		//console.log([item.title, $scope.editableTitle]);
-		item.title = $scope.titleField[item.id];
-		item.content = $scope.contentField[item.id];
-		//console.log([item.title, $scope.editableTitle]);
+		item.title = item.titleField;
+		item.content = item.contentField;
 		$scope.editorEnabled = false;
 		// TODO post this stuff
+		// post('/resource/save/<id>/title/content/done/')
+		// post('/resource/new/title/content/done/')
+
 	};
 
 

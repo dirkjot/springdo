@@ -1,0 +1,10 @@
+
+.text_type_bold{
+    font-style:none;
+    font-weight:bold;
+}
+
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none !important;
+}

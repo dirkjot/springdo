@@ -78,7 +78,7 @@ index.html (commented out) which allows you to test the main page by
 itself, without a server.
 
 
-** working on show/hide content
+** TODO working on show/hide content
 
 
 what we learned about angular:
@@ -103,10 +103,61 @@ what we learned about angular:
   <dt ng-click="toggleCustom(item.id)">Our ToDo title here</dt>
 
 
+- stored the front end business in https://jsfiddle.net/t1q5x5g8/
 
-docs used:
+
+*** docs used:
 https://docs.angularjs.org/api/ng/directive/ngShow
 http://geniuscarrier.com/ng-toggle-in-angularjs/
+
+
+
+** TODO user edits text fields
+
+*** design
+
+we decided to go for an edit button , as a click on the text is nice,
+but doesn't work for the title (already a collapse action).  we may
+add a shortcut to edity by click on content later.
+
+added edit and trash buttons from font awesome.
+
+stored in jsfiddle: https://jsfiddle.net/65wbya5L/
+
+we bolded all the item titles and removed the id numbers (dev only).
+We decided against angular magic to make only the title of the
+currently open todo item bold. 
+
+The html page has become quite complex:  Each item has two forms, one
+for the not-editing state (with only a checkbox as a form element) and
+one for editing the title and content, with an additional edit
+button. Each item has these forms, so there are a lot of forms open at
+the same time.  
+
+Each form has its own id, made up of 'form'+item.id (or 'editform').
+Each of the forms points to its own model in a big array,
+titleField[item.id] and contentField[item.id].  This is in addition to
+a item specific toggleContent state.  These three arrays could be
+avoided by treating all items as objects, with item.contentField etc. 
+
+The editing form field could have been written much simpler by
+writing: 
+: <input type="text" ng-model="item.title" class="form-control">
+Angular will 'live' update the item.title variable as the user is
+typing, and there is no need to copy values back and forth.  However,
+the drawback of this method is that you cannot undo your edits. Even
+though we do not have a Cancel button in the original design, we felt
+that clicking away (ie clicking on the title of another todo item),
+should cancel the edit. 
+To do that, we need to either  save the old value, or run the input
+box on another variable.  
+ 
+
+*** docs used
+
+http://icelab.com.au/articles/click-to-edit-with-angularjs/
+
+
 
 
 **  screenshots
