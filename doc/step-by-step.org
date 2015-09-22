@@ -62,6 +62,16 @@ created a link with github as follows:
 - under services, choose pivotal tracker and enter api key.  
 
 
+** commit 4e11bb268d0fa0d4fbc005d300520c1218313fa6
+
+- added checkboxes to UI as requested by story
+- factored placeholder data to be created on application boot. 
+- Created Item model and added checkboxes. 
+- Selection of checkboxes is posted to the controller and persisted.
+- found out how to do db init at startup, see snippet below
+
+
+
 
 **  screenshots
 
@@ -72,6 +82,58 @@ run/debug configuration
 [[./screenshots/run-debug-config-1.png]]
 
 
+* things to remember /snippets
+
+** to run commands right after boot startup
+
+make your app extend 'commandlinerunner' and then override the run method:
+
+package io.pivotal;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SpringdoApplication implements CommandLineRunner {
+
+    
+    @Autowired
+    ItemRepository itemRepository;
+    
+    public static void main(String[] args) {
+        SpringApplication.run(SpringdoApplication.class, args);
+    }
+
+    @Override
+    public void run(String... strings) throws Exception {
+        // save a couple of customers
+        itemRepository.save(new Item("Jack", "Bauer"));
+        itemRepository.save(new Item("Chloe", "O'Brian"));
+        itemRepository.save(new Item("Kim", "Bauer"));
+        itemRepository.save(new Item("David", "Palmer"));
+        itemRepository.save(new Item("Michelle", "Dessler"));
+    }
+
+}
 
 
 
+
+
+
+** to convert an iterable (also an iterator) to a list
+
+in java 8 , you can use a lambda and some good functional syntax:
+
+Iterable<Item> iterable = itemRepository.findAll();
+List<Item> result = new ArrayList<>();
+iterable.iterator().forEachRemaining(result::add);
+
+- the first line creates an iterable (abstract), which will be
+  'instantiated' to an iterator in line 3
+- the second line creates an empty list of the right type 
+- the third line maps the add function of the empty list to each item
+  of the iterator.
+- voila
