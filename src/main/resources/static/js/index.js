@@ -9,11 +9,32 @@ angular.module('index', []).controller('home', function($scope, $http) {
 			console.log(item.done);
 			$http.post('/resource/done/' + item.id + '/' + item.done + '/');};
 
-	$scope.toggle = [];
-	$scope.toggleCustom = function(myvar) {
-		//console.log($scope.toggle[myvar]);
-		for (var key in $scope.toggle) {
-			$scope.toggle[key] = false; }
-		$scope.toggle[myvar] = $scope.toggle[myvar] === true ? false : true;};
+	// hiding showing content
+	$scope.content = [];
+	$scope.toggleContent = function(myvar) {
+		//console.log($scope.content[myvar]);
+		for (var key in $scope.content) {
+			if (key != myvar) {
+			$scope.content[key] = false; }}
+		$scope.content[myvar] = !$scope.content[myvar]; };
+
+
+	// editing content
+	$scope.editorEnabled = false;
+
+	$scope.goedit = function (item) {
+
+		$scope.editorEnabled = true;
+		$scope.editableTitle = $scope.item.title;
+		$scope.editableContent = $scope.item.content;
+	};
+
+	$scope.saveedit = function (item) {
+		$scope.item.title = $scope.editableTitle;
+		$scope.item.content = $scope.editableContent;
+		$scope.editorEnabled = false;
+		// TODO post this stuff
+	};
+
 
 });

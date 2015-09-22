@@ -18,8 +18,13 @@
         <div class="list-group">
             <div ng-repeat="item in listofitems">
                 <div class="list-group-item row">
-                    <div ng-click="toggleCustom(item.id)" class="col-md-6">{{item.title}} ({{item.id}})
-                        <p ng-show="toggle[item.id]">{{item.content}}</p>
+
+                    <div ng-click="toggleContent(item.id)" class="col-md-6">{{item.title}} ({{item.id}})
+                        <div ng-show="content[item.id]">
+                            <p>{{item.content}}</p>
+                            <span class="glyphicon glyphicon-pencil" ng-click="goedit(item.id)"></span>
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </div>
                     </div>
                     <form name="form{{item.id}}">
                         <div class="col-md-6">Done
