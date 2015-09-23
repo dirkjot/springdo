@@ -94,4 +94,16 @@ public class ListOfItemsController {
 
     //  XX post('/resource/new/{title}/{content}/{done}/')
     //  post('/resource/create/') -> returns id.
+
+
+    /**
+     * Create a new todo item
+     * @return full item representation, with empty fields
+     */
+    @RequestMapping(value="/resource/create/", method=RequestMethod.GET)
+    Item postSaveUpdate() {
+        Item item = itemRepository.save(new Item());
+        return item;
+    }
+
 }

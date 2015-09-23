@@ -9,6 +9,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -86,4 +87,14 @@ public class ListOfItemsControllerTest {
     }
 
 
+    @Test
+    public void whenCreateIsHitANewItemIsCreatedAndReturned() throws Exception {
+        mvc.perform(get("/resource/create/"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.title", is("")))
+                .andExpect(jsonPath("$.content", is("")))
+                .andExpect(jsonPath("$.done", is("no")));
+
+    }
 }
