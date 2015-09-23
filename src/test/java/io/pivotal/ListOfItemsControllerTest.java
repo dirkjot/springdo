@@ -88,7 +88,6 @@ public class ListOfItemsControllerTest {
         assertEquals(newItem.done, "yes");
     }
 
-
     @Test
     public void whenEditIsMadeTheModelIsUpdated() throws Exception {
         // setup
@@ -105,5 +104,14 @@ public class ListOfItemsControllerTest {
 
     }
 
-    
+    @Test
+    public void whenCreateIsHitANewItemIsCreatedAndReturned() throws Exception {
+        mvc.perform(get("/resource/create/"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.title", is("")))
+                .andExpect(jsonPath("$.content", is("")))
+                .andExpect(jsonPath("$.done", is("no")));
+
+    }
 }

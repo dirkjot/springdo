@@ -41,9 +41,10 @@ angular.module('index', []).controller('home', function($scope, $http) {
 	};
 
 	$scope.plusbutton = function () {
-		$scope.listofitems.push({"id": 6, "title": "new item", "content": "Hi", "done": "no"});
+		$http.get('resource/create/').success(function(newitem) {
+			$scope.listofitems.push(newitem);
+			$scope.toggleContent(newitem.id);
+			$scope.goedit(newitem);
+		});
 	};
-
-
-
 });
