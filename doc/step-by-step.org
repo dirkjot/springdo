@@ -78,7 +78,7 @@ index.html (commented out) which allows you to test the main page by
 itself, without a server.
 
 
-** TODO working on show/hide content
+** commit 0a69691b627761b56237bc4bb7ac7b9b57d62706: working on show/hide content
 
 
 what we learned about angular:
@@ -112,7 +112,7 @@ http://geniuscarrier.com/ng-toggle-in-angularjs/
 
 
 
-** TODO user edits text fields
+** commit e66aa8779b098345da115f5c23d73b25231ca36d: user edits text fields
 
 *** design
 
@@ -149,13 +149,72 @@ the drawback of this method is that you cannot undo your edits. Even
 though we do not have a Cancel button in the original design, we felt
 that clicking away (ie clicking on the title of another todo item),
 should cancel the edit. 
+
 To do that, we need to either  save the old value, or run the input
-box on another variable.  
+box on another variable.  We chose the latter, each item will be given
+an inputField and titleField for editing purposes.  
+
  
 
 *** docs used
 
 http://icelab.com.au/articles/click-to-edit-with-angularjs/
+
+
+** <intermediate commits>
+
+commit e867ef62da5ec9ea5d8d99d71d70aff49b24b6b9
+Author: Navya <ncanumalla@pivotal.io>
+Date:   Tue Sep 22 16:08:51 2015 -0700
+
+    Front end further improved and made much more pretty.  Small bug fixes.
+
+commit 39b1ea432cdcfa209ef813f2f58deffa95bc4abe
+Author: Navya <ncanumalla@pivotal.io>
+Date:   Tue Sep 22 15:13:11 2015 -0700
+
+    front end changes complete for editing todo items
+
+commit 5cd646e01d299bb9e5e5e683725711afae62bd95
+Author: Navya <ncanumalla@pivotal.io>
+Date:   Tue Sep 22 14:21:14 2015 -0700
+
+    #103828038-  Added glyphicons and cleaned up the html.
+
+
+** commit 56dc918a833ce34e8b0aea9cf554c1d94a4497f0 save changes to back end
+
+This is a very short commit, all we had to do was add a post to the
+backend (/resource/edit/..) and write a controller to receive that
+post.
+
+
+** creating a new node
+
+- first thought of new endpoint
+  `/resources/new/{title}/{content}/{done}/` but rejected that as the
+  new button will put us in an edit form
+- also, we need to get that id for the new post, only backend can do
+  that
+- so `/resources/create/` -> item object (json) instead.  this returns
+  the item (in json) that was just created on the server.  Advantages:
+  any created at/by etc headers (future fields) can be inserted by the
+  server.   We can also have template notes etc etc.  
+- when we get the new item, we have to insert a new bit of html, for
+  which we use the minimal jquery built in to angular
+- to make this all work well, we had to partial out the html that
+  renders one item, so we can use it a/ in the ng-repeat when we read
+  the list of existing items b/ in the new when we create a new item.
+  Also , this will allow for later c/ insert a new item that was added
+  by another client. 
+
+*** things learned
+ 
+- note that ng-include expects a variable name as a src.  so if you
+  know your template name you have to use 2 layers of 
+  : <div ng-include src='"toBeIncluded.html"' ng-controller='ctrlA'></div>
+  See [[http://stackoverflow.com/questions/13811948/different-ng-includes-on-the-same-page-how-to-send-different-variables-to-each/13812605#13812605][this SO Post]]
+
 
 
 
@@ -167,7 +226,6 @@ project structure settings
 
 run/debug configuration 
 [[./screenshots/run-debug-config-1.png]]
-
 
 * things to remember /snippets
 

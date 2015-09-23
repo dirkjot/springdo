@@ -6,21 +6,21 @@ angular.module('index', []).controller('home', function($scope, $http) {
 		$scope.listofitems = data; });
 
 	$scope.onDoneClick = function (item) {
-			console.log(item.done);
-			$http.post('/resource/done/' + item.id + '/' + item.done + '/');};
+			//console.log(item.done);
+			$http.post('/resource/done/' + item.id + '/' + item.done + '/');
+		//console.log(item.done);
+		};
 
 	// hiding showing content
 	$scope.content = [];
-	$scope.contentField = [];
-	$scope.titleField = [];
 
-	$scope.toggleContent = function(myvar) {
-		//console.log($scope.content[myvar]);
+	$scope.toggleContent = function(itemid) {
+		//console.log($scope.content[itemid]);
 		$scope.editorEnabled = false;
 		for (var key in $scope.content) {
-			if (key != myvar) {
+			if (key != itemid) {
 				$scope.content[key] = false; }}
-		$scope.content[myvar] = !$scope.content[myvar]; };
+		$scope.content[itemid] = !$scope.content[itemid]; };
 
 
 	// editing content
@@ -40,6 +40,10 @@ angular.module('index', []).controller('home', function($scope, $http) {
 		$scope.editorEnabled = false;
 		$http.post('/resource/save/' + item.id + '/' + item.title + '/' + item.content + '/' + item.done + '/');
 
+	};
+
+	$scope.plusbutton = function () {
+		$scope.listofitems.push({"id": 6, "title": "new item", "content": "Hi", "done": "no"});
 	};
 
 
