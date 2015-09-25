@@ -2,6 +2,8 @@ package io.pivotal;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +15,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringdoApplication.class)
@@ -98,6 +98,7 @@ public class ListOfItemsControllerTest {
                 .andExpect(status().isOk());
         assertNotEquals(item.title, newtitle);
         Item newItem = itemRepository.findOne(item.id);
+        assertThat(newtitle).isEqualTo(newItem.title); //fest
         assertEquals(newItem.title, newtitle);
         assertEquals(newItem.content, item.content);
 
