@@ -3,15 +3,26 @@ package io.pivotal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
+@EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
 @SpringBootApplication
 public class SpringdoApplication implements CommandLineRunner {
 
     
     @Autowired
     ItemRepository itemRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    InMemoryUserDetailsManager inMemoryUserDetailsManager;
     
     public static void main(String[] args) {
         SpringApplication.run(SpringdoApplication.class, args);
@@ -25,6 +36,13 @@ public class SpringdoApplication implements CommandLineRunner {
         itemRepository.save(new Item("Kim", "Bauer"));
         itemRepository.save(new Item("David", "Palmer"));
         itemRepository.save(new Item("Michelle", "Dessler"));
+
+        userRepository.save(new User("Navya", "secret", "n@example.com"));
+        userRepository.save(new User("t", "t", "t@example.com"));
+
+        userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.users.put(user.getAuthdbKey(), user.getAuthdbValue()));
+        userRepository.findAll();
+
     }
 
 }
