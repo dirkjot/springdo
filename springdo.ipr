@@ -50,6 +50,24 @@
     <setting name="root" />
   </component>
   <component name="IdProvider" IDEtalkID="11DA1DB66DD62DDA1ED602B7079FE97C" />
+  <component name="InspectionProjectProfileManager">
+    <profile version="1.0">
+      <option name="myName" value="Project Default" />
+      <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="myValues">
+          <value>
+            <list size="1">
+              <item index="0" class="java.lang.String" itemvalue="th:action" />
+            </list>
+          </value>
+        </option>
+        <option name="myCustomValuesEnabled" value="true" />
+      </inspection_tool>
+    </profile>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
+  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
     <option name="OPTION_SCOPE" value="protected" />
@@ -326,6 +344,24 @@
       <JAVADOC />
       <SOURCES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.minidev/json-smart/1.2/b882d44cc5d0cf1c60e6cafa0c2061ddccad3347/json-smart-1.2-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:1.2.9">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/nz.net.ultraq.thymeleaf/thymeleaf-layout-dialect/1.2.9/2de1729ef42f9571fcbc7c982b274f9029e57a65/thymeleaf-layout-dialect-1.2.9.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/nz.net.ultraq.thymeleaf/thymeleaf-layout-dialect/1.2.9/55b17d18a3dd1babd43205cf116d8ab76b4176e4/thymeleaf-layout-dialect-1.2.9-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: ognl:ognl:3.0.8">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/ognl/ognl/3.0.8/37e1aebfde7eb7baebc9ad4f85116ef9009c5fc5/ognl-3.0.8.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/ognl/ognl/3.0.8/1b6bace3760cdf6dfb2c0fea0b266fa9d802c403/ognl-3.0.8-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Gradle: org.apache.tomcat.embed:tomcat-embed-core:8.0.26">
@@ -607,6 +643,15 @@
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-logging/1.2.6.RELEASE/9d08ed7d24078eda074bcb56f17bc955496b1720/spring-boot-starter-logging-1.2.6.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Gradle: org.springframework.boot:spring-boot-starter-security:1.2.6.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-security/1.2.6.RELEASE/bfdc3eecf93794bf56382c2c7740df21f79e3c3/spring-boot-starter-security-1.2.6.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-security/1.2.6.RELEASE/42b2b4312cf13c1dd1d9f6613e0f14e579e2889a/spring-boot-starter-security-1.2.6.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Gradle: org.springframework.boot:spring-boot-starter-test:1.2.6.RELEASE">
       <CLASSES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-test/1.2.6.RELEASE/43644897c7d755858c847f1959d73c0bd2f58925/spring-boot-starter-test-1.2.6.RELEASE.jar!/" />
@@ -614,6 +659,15 @@
       <JAVADOC />
       <SOURCES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-test/1.2.6.RELEASE/d052803c56d9fe9dc713517623df4c2750b19cb7/spring-boot-starter-test-1.2.6.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.springframework.boot:spring-boot-starter-thymeleaf:1.2.6.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-thymeleaf/1.2.6.RELEASE/3c42a2c0dfcdce3b7f0750c536450896b2931637/spring-boot-starter-thymeleaf-1.2.6.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-starter-thymeleaf/1.2.6.RELEASE/a1c761a3584c998ebdfcadbb8533396a524754bf/spring-boot-starter-thymeleaf-1.2.6.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Gradle: org.springframework.boot:spring-boot-starter-tomcat:1.2.6.RELEASE">
@@ -668,6 +722,33 @@
       <JAVADOC />
       <SOURCES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.data/spring-data-jpa/1.7.3.RELEASE/842c64e6a4b4c2c6db2338764eb13b8089512476/spring-data-jpa-1.7.3.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.springframework.security:spring-security-config:3.2.8.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-config/3.2.8.RELEASE/8802c9514f4e1e65ab1550613b269db1eec900ef/spring-security-config-3.2.8.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-config/3.2.8.RELEASE/ca296b5244d295b1bfbde22ce7faa0e0ee8ebf09/spring-security-config-3.2.8.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.springframework.security:spring-security-core:3.2.8.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-core/3.2.8.RELEASE/36028a35ca93f504dfc2484dc12e5b00a42bc54b/spring-security-core-3.2.8.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-core/3.2.8.RELEASE/8a48b79699d9a37b28c13c7e4296383b1e37609b/spring-security-core-3.2.8.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.springframework.security:spring-security-web:3.2.8.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-web/3.2.8.RELEASE/55f8d16b6fdfad43eb43e0c3f8b3a269c1997d79/spring-security-web-3.2.8.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.security/spring-security-web/3.2.8.RELEASE/58c0b67f61d2bb07fb6ef51c5f564bc37601228c/spring-security-web-3.2.8.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Gradle: org.springframework:spring-aop:4.1.7.RELEASE">
@@ -776,6 +857,33 @@
       <JAVADOC />
       <SOURCES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-webmvc/4.1.7.RELEASE/e5f4d94b72f8740c04e2cce66a8a2900bbbcf567/spring-webmvc-4.1.7.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.thymeleaf:thymeleaf-spring4:2.1.4.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.thymeleaf/thymeleaf-spring4/2.1.4.RELEASE/e5677e7daedfd05e001945abf4295305ac23826b/thymeleaf-spring4-2.1.4.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.thymeleaf/thymeleaf-spring4/2.1.4.RELEASE/69f9fde587c69648bc1c2d59681ab38e77221a64/thymeleaf-spring4-2.1.4.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.thymeleaf:thymeleaf:2.1.4.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.thymeleaf/thymeleaf/2.1.4.RELEASE/a730d892f3c57ba3d24af2ca657b42d81398a85a/thymeleaf-2.1.4.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.thymeleaf/thymeleaf/2.1.4.RELEASE/4aa7049660b4d1a6a34348c1fdd91cd5d8eee1cb/thymeleaf-2.1.4.RELEASE-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Gradle: org.unbescape:unbescape:1.1.0.RELEASE">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.unbescape/unbescape/1.1.0.RELEASE/ab0db4fe0a6fa89fb8da2a40008a4e63a7f3f5b9/unbescape-1.1.0.RELEASE.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.unbescape/unbescape/1.1.0.RELEASE/ffc384b1f9fcd7d9a61d764b3cafccca187cb02f/unbescape-1.1.0.RELEASE-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Gradle: org.yaml:snakeyaml:1.14">
