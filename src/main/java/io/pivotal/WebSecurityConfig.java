@@ -42,19 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager () {
         Properties users = new Properties();
-//        userRepository.findAll().forEach(user -> users.put(user.getAuthdbKey(), user.getAuthdbValue()));
-//        users.put("user", "pass,ROLE_USER,enabled");
-        users.put("n", "n,ROLE_USER,enabled");
-//        users.remove("user");
         return new InMemoryUserDetailsManager(users);
-
     }
 
-
-//        @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .inMemoryAuthentication()
-//                .withUser("user").password("password").roles("USER");
-//    }
 }

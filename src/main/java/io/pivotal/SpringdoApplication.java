@@ -40,8 +40,9 @@ public class SpringdoApplication implements CommandLineRunner {
         userRepository.save(new User("Navya", "secret", "n@example.com"));
         userRepository.save(new User("t", "t", "t@example.com"));
 
-        userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.users.put(user.getAuthdbKey(), user.getAuthdbValue()));
-        userRepository.findAll();
+        userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
+        // example of how you would change an existing user, this will throw Illegal State Exception if the username does not exist
+        //inMemoryUserDetailsManager.updateUser(new User("t", "tt", "xx"));
 
     }
 
