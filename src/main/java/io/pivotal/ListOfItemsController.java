@@ -1,11 +1,17 @@
 package io.pivotal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.*;
 
 /**
@@ -18,9 +24,15 @@ public class ListOfItemsController {
     @Autowired
     ItemRepository itemRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
-    List listOfItems() {
-        Iterable<Item> iterable = itemRepository.findAll();
+    List listOfItems(Principal principal) {
+        // we know they are logged in as spring security is set up that way
+        String username = principal.getName();
+        // User user = userRepository.findUserbyName(username);
+        Iterable<Item> iterable = itemRepository.findAll();  // findItembyUser(user);
         List<Item> result = new ArrayList<>();
         iterable.iterator().forEachRemaining(result::add);
         return result;
@@ -28,7 +40,6 @@ public class ListOfItemsController {
 
     @RequestMapping(value="/resource/dummylist/", method= RequestMethod.GET)
     List listOfDummyItems() {
-
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         Map<String, String> map1 = new HashMap<String, String>();
         map1.put("id", "1");
@@ -45,6 +56,16 @@ public class ListOfItemsController {
         result.add(1, map2);
 
         return result;
+    }
+
+    /**
+     * Function to determine who is logged in.
+     * @param principal
+     * @return
+     */
+    @RequestMapping(value="/who/")
+    String whoIsLoggedIn(Principal principal) {
+        return principal.getName();
     }
 
     /**

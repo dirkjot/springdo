@@ -3,12 +3,11 @@ package io.pivotal;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by pivotal on 9/25/15.
@@ -20,6 +19,11 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     public long id;
+
+
+    @OneToMany(mappedBy = "userId")
+    private Set<Item> items = new HashSet<>();
+
 
     private String name;  // login credential
     private String password;

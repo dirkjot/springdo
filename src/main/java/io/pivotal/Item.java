@@ -5,10 +5,9 @@ package io.pivotal;
  */
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import org.hibernate.annotations.ManyToAny;
+
+import javax.persistence.*;
 
 @Entity
 public class Item {
@@ -19,6 +18,9 @@ public class Item {
     public String title;
     public String content;
     public String done;
+
+    @ManyToOne
+    private User userId;
 
     public Item(String title, String content){
         this.title = title;

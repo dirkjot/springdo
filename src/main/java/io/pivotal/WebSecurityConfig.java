@@ -36,9 +36,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(inMemoryUserDetailsManager());
     }
 
-    @Autowired
-    UserRepository userRepository;
-    
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager () {
         Properties users = new Properties();
