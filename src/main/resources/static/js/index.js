@@ -5,6 +5,9 @@ angular.module('index', []).controller('home', function($scope, $http) {
 		//$scope.greeting = {id: 'xxx', content: 'Hello World!'};
 		$scope.listofitems = data; });
 
+	$http.get("resource/who/").success(function(data) {
+		$scope.springdoUserName = data; });
+
 	$scope.onDoneClick = function (item) {
 			//console.log(item.done);
 			$http.post('/resource/done/' + item.id + '/' + item.done + '/');

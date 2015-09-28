@@ -63,7 +63,7 @@ public class ListOfItemsController {
      * @param principal
      * @return
      */
-    @RequestMapping(value="/who/")
+    @RequestMapping(value="resource/who/")
     String whoIsLoggedIn(Principal principal) {
         return principal.getName();
     }
