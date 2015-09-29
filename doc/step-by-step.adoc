@@ -268,6 +268,66 @@ Date:   Wed Sep 23 13:55:06 2015 -0700
 
     added a test for the save end point
 
+
+** commits missed
+
+** commit 4362ab35762d5e1c61351791e85d654c07b986d8 getting users working
+
+*NOTE* this is wrong because we do not actually read the user name, but list
+items of user 1 all the time.  it makes for a great incremental push though.
+
+A few things went into this
+- show userId on list of items
+- filter list of items by user
+- modify example items to have a user. 
+- we have a double representation of our users: THey are persisted in
+  the userRepository (which is currently in an in-memory database, but
+  this can easily be changed).  On application startup, the users are
+  moved to the authentication database in the run method of
+  SpringdoApplication: 
+  : userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
+- we will have to make sure that any operations on users are reflected
+  in both databases, or that we empty and refresh the
+  inMemoryUserDetailsManager after each change.
+- the magic around the login/logout forms is explained over at [[http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#jc-form][Spring
+  Security 101]].  As this all uses thymeleaf and not bootstrap, we will
+  update this shortly. 
+
+*** things learned
+
+- Angular really wants valid json from our endpoints.  Even a single
+  string is valid json (see jsonlint.com), but it has to be quoted. If
+  you forget quotes, you get very interesting errors from within the
+  angular library (something like "syntax error: unexpected token '"
+  etc).  If you use single quotes instead of double quotes, same
+  error. 
+- We opted for return hashes (dictionaries) all the time, as they
+  allow us to later expand on the API without breaking things. 
+- look at the boot extensions to JPA very carefully, as the syntax is
+  a bit finicky and any typo will result in less than helpful error
+  messages (" No property findItembyUser found for type Item!").  We
+  were stuck on ItembyUser vs ItemByUser (correct).  See also this
+  explanation:
+  https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods
+- JPA does some magic so that Items belong to actual user objects, but
+  underlyingly, UserIDs are used.  Just ignore that part, or your JPA
+  code will not work.
+  Our items have `@ManyToOne  private User user;` which shows that
+  many items (the defining class) are mapped to one user.  Our users
+  have `@OneToMany(mappedBy = "user")    private Set<Item> items = new
+  HashSet<>();`. The `mappedBy` shows what this is called on the
+  'many' side. 
+-
+
+
+
+** commit
+
+- adding admin interface to list all items with user details etc
+- changing user listOfItems to list items of the current user, not
+  user 1
+- adding a new todo should work
+
 **  screenshots
 
 project structure settings

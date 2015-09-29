@@ -37,6 +37,7 @@ public class SpringdoApplication implements CommandLineRunner {
         itemRepository.save(new Item("Jack", "Bauer lorem ipsum and a very long story indeed. Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed. ", defaultUser));
         itemRepository.save(new Item("Chloe", "O'Brian", defaultUser));
         itemRepository.save(new Item("Kim", "Bauer", defaultUser));
+
         itemRepository.save(new Item("David", "Palmer", secondUser));
         itemRepository.save(new Item("Michelle", "Dessler", secondUser));
 

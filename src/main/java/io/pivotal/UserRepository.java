@@ -8,7 +8,7 @@ import java.util.List;
  */
 
 public interface UserRepository extends CrudRepository<User, Long> {
-    // this doesn't work:  User findUserbyName(String name);
+    User findUserByName(String name);
 }
 
 

@@ -1,13 +1,13 @@
 package io.pivotal;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.servlet.View;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by pivotal on 9/25/15.
@@ -106,12 +106,21 @@ public class User implements UserDetails {
         return true;
     }
 
+    /**
+     * Standard three argument constructor
+     * @param name
+     * @param password
+     * @param email
+     */
     public User(String name, String password, String email) {
         this.name = name;
         this.password = password;
         this.email = email;
     }
 
+    /**
+     * JPA requires a zero argument constructor
+     */
     public User() {
         this.name = "";
         this.password = "";
@@ -125,6 +134,18 @@ public class User implements UserDetails {
 
     public String getAuthdbValue () {
         return password + ",ROLE_USER,enabled";  // TODO this should use our other variables
+    }
+
+    /**
+     * The Jackson json parser will use this to represent users
+     * @return
+     */
+
+    @JsonValue
+    Map toJson() {
+        Map<String, String> result = new HashMap<>();
+        result.put("name", this.getUsername());
+        return result;
     }
 }
 

@@ -25,14 +25,13 @@ public class ListOfItemsController {
     @Autowired
     UserRepository userRepository;
 
+
     @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
     List listOfItems(Principal principal) {
         // we know they are logged in as spring security is set up that way
         String username = principal.getName();
-        User defaultUser = userRepository.findOne((long) 1);
-        // User user = userRepository.findByName(username);
-        // Iterable<Item> iterable = itemRepository.findAll();
-        Iterable<Item> iterable = itemRepository.findItemByUser(defaultUser);
+        User user = userRepository.findUserByName(username);
+        Iterable<Item> iterable = itemRepository.findItemByUser(user);
         List<Item> result = new ArrayList<>();
         iterable.iterator().forEachRemaining(result::add);
         return result;
@@ -132,8 +131,9 @@ public class ListOfItemsController {
      * @return full item representation, with empty fields
      */
     @RequestMapping(value="/resource/create/", method=RequestMethod.GET)
-    Item postSaveUpdate() {
-        Item item = itemRepository.save(new Item());
+    Item postSaveUpdate(Principal principal) {
+        User user = userRepository.findUserByName(principal.getName());
+        Item item = itemRepository.save(Item.empty(user));
         return item;
     }
 
