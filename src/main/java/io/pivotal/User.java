@@ -1,10 +1,7 @@
 package io.pivotal;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.servlet.View;
 
 import javax.persistence.*;
 import java.util.*;
@@ -14,7 +11,7 @@ import java.util.*;
  */
 
 @Entity
-public class User implements UserDetails {
+public class User implements org.springframework.security.core.userdetails.UserDetails {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -24,9 +21,13 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")  // what this is called on the 'many' side
     private Set<Item> items = new HashSet<>();
 
-
+    @JsonView(JsonViews.ItemList.class)
     private String name;  // login credential
+
+    @JsonView(JsonViews.UserDetails.class)
     private String password;
+
+    @JsonView(JsonViews.UserDetails.class)
     private String email;  // for password reminders etc
 
 
@@ -141,7 +142,8 @@ public class User implements UserDetails {
      * @return
      */
 
-    @JsonValue
+    //@JsonView(JsonViews.ItemList.class)
+    //@JsonValue
     Map toJson() {
         Map<String, String> result = new HashMap<>();
         result.put("name", this.getUsername());

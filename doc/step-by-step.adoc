@@ -328,6 +328,53 @@ A few things went into this
   user 1
 - adding a new todo should work
 
+*** things learned
+- add this to your application.properties will make the json much more
+  legible (and longer so switch off in production)
+  : spring.jackson.serialization.indent_output=true
+  There are many settings, see [[http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto-customize-the-jackson-objectmapper][spring boot docs]] and [[https://spring.io/blog/2014/12/02/latest-jackson-integration-improvements-in-spring][this blog post]]. 
+- we accidentally had the user as a private property on the unit.
+  this means it will not be serialized, so all our list of items (even
+  for admin) did not have users on them.  
+- once we made user a public property, we see very verbose user
+  reports which include all properties of the users.  We don't need
+  that, just the name is enough
+#+BEGIN_SRC json
+{
+  "id" : 1,
+  "title" : "Jack",
+  "content" : "Bauer lorem ipsum and a very long story indeed. Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed. ",
+  "done" : "no",
+  "user" : {
+    "id" : 1,
+    "password" : "secret",
+    "accountNonExpired" : true,
+    "authorities" : [ {
+      "authority" : "ROLE_USER"
+    } ],
+    "username" : "Navya",
+    "accountNonLocked" : true,
+    "credentialsNonExpired" : true,
+    "enabled" : true,
+    "authdbKey" : "Navya",
+    "authdbValue" : "secret,ROLE_USER,enabled"
+  }
+} 
+#+END_SRC
+
+- the @JsonValue on a User method 'toJson' allows us to do just that,
+  the methods annotated like that will be used to serialize the object
+  instead of the normal approach.
+- However, this means that users are *always* serialized as just the
+  name. That is clearly not what we want, we created a user detail
+  page at `/resource/user/{username}` to show how this goes wrong.
+- we need @JsonManagedReference, @JsonBackReference
+
+*** resources
+- http://www.baeldung.com/jackson-serialize-enums   on how to
+  serialize users in a nice way, they were ignored until we added a
+  @JsonValue to them. 
+
 **  screenshots
 
 project structure settings

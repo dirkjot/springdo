@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="admin">
+<head>
+    <meta charset="UTF-8">
+    <title>SpringDo Admin Page</title>
+    <link href="css/angular-bootstrap.css" rel="stylesheet">
+    <link href="css/local.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+    <div ng-controller="ad1" ng-cloak class="ng-cloak">
+    <h1>Admin page for SpringDo</h1>
+        <p>Logged in as:  {{springdoUserName}}</p>
+        <div ng-repeat="item in listofitems">
+            <div ng-include src="'adminitem.html'"></div>
+        </div>
+    </div>
+
+    <br>
+    <form action="/logout" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+
+    <script type="text/ng-template" id="adminitem.html">
+        <div class="list-group-item row">
+            <div class="col-md-6">
+                ({{item.id}}) "{{item.title}}" <i>by</i> {{item.user["name"]}}
+            </div>
+        </div>
+    </script>
+</div>
+
+
+<script src="js/angular-bootstrap.js" type="text/javascript"></script>
+<script src="js/admin.js"></script>
+
+</body>

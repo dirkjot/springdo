@@ -1,7 +1,7 @@
 <!doctype html>
 <html ng-app="index">
 <head>
-    <title>Hello AngularJS</title>
+    <title>SpringDo</title>
     <link href="css/angular-bootstrap.css" rel="stylesheet">
     <link href="css/local.css" rel="stylesheet">
 </head>
@@ -10,17 +10,19 @@
 <div class="container">
     <div ng-controller="home" ng-cloak class="ng-cloak">
         <h1>TODO list for {{springdoUserName}}</h1>
-        <div ng-click="plusbutton()">Plus</div>
         <div class="list-group">
             <div ng-repeat="item in listofitems">
                 <div ng-include src="'itemform.html'"></div>
             </div>
         </div>
-    </div>
 
-    <form action="/logout" method="post">
-        <input type="submit" value="Sign Out"/>
-    </form>
+        <div type="button" class="btn btn-default btn-lg" aria-label="Add item"">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"  ng-click="plusbutton()"></span>
+        </div>
+        <form action="/logout" method="post">
+            <input type="submit" value="Sign Out"/>
+        </form>
+    </div>
 
     <script type="text/ng-template" id="itemform.html">
     <div class="list-group-item row">

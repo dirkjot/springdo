@@ -5,6 +5,8 @@ package io.pivotal;
  */
 
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 
 
@@ -14,11 +16,19 @@ public class Item {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
+    @JsonView(JsonViews.ItemList.class)
     public long id;
+
+    @JsonView(JsonViews.ItemList.class)
     public String title;
+
+    @JsonView(JsonViews.ItemList.class)
     public String content;
+
+    @JsonView(JsonViews.ItemList.class)
     public String done;
 
+    @JsonView(JsonViews.ItemList.class)
     @ManyToOne
     public User user;
 
