@@ -321,7 +321,7 @@ A few things went into this
 
 
 
-** commit
+** commit 0da5e06937fb440a09faed60adc0d3fe7ee60561  users fully working, incl new item
 
 - adding admin interface to list all items with user details etc
 - changing user listOfItems to list items of the current user, not
@@ -368,12 +368,43 @@ A few things went into this
 - However, this means that users are *always* serialized as just the
   name. That is clearly not what we want, we created a user detail
   page at `/resource/user/{username}` to show how this goes wrong.
-- we need @JsonManagedReference, @JsonBackReference
+- One approach is to use the @JsonView methods, which annotate the
+  attributes in the models and the methods on the controllers to
+  specify which attributes should be shown on this view.  
+- Alternatively, we can use @JsonManagedReference, @JsonBackReference
+  but that does not allow us to specify which fields we want to show.
+- We went with annotating all properties in User and Item with either
+  JsonViews.ItemList of JsonViews.UserDetails, and a special abstract
+  class was set up to allow for these two views.
+
 
 *** resources
 - http://www.baeldung.com/jackson-serialize-enums   on how to
   serialize users in a nice way, they were ignored until we added a
   @JsonValue to them. 
+- really good overview of how angular works, in only 2 pages:
+  http://tutorials.jenkov.com/angularjs/watch-digest-apply.html
+- post with lots of pointers, and good separation of what you will
+  need to know now vs. tomorrow.
+  http://ruoyusun.com/2013/05/25/things-i-wish-i-were-told-about-angular-js.html
+
+** commit 92c2fe8a3225f23276954830cf489ad280d608ea delete button
+
+Make the delete button work  `/resourece/delete/{itemid}/`
+
+- The backend function was easy, a simple delete on the jpa.  Turns
+  out we can delete by using the full item object, or by using the
+  id.  
+- The front end needs to reflect the deleted item.  Ideally, the back
+  end would post an update, but we don't have that functionality yet
+  so we manually delete the item from our listofitems, using the js
+  `splice` function: `splice(i,1)` removes one item at index `i`.
+  We iterate backwards through listofitems, as the ending condition
+  for forward iteration would have to be changed as we go and
+  apparently, js will precompute this.
+
+
+
 
 **  screenshots
 
@@ -460,3 +491,15 @@ from brian kelly's crud note video:
   Update /notes/Id POST, Delete ..?
 - use @lob annotation on large jpa fields (ie content)
 - uses pegdown to allow markdown
+- polling the server for changes etc.     for a start, see polling
+  example: http://jsfiddle.net/rishabh/Kuewm/
+- The $http legacy promise methods success and error have been
+  deprecated. Use the standard then method
+  instead. https://docs.angularjs.org/api/ng/service/$http
+- then(successCallback, errorCallback, notifyCallback) – regardless of
+  when the promise was or will be resolved or rejected, then calls one
+  of the success or error callbacks asynchronously as soon as the
+  result is available. The callbacks are called with a single
+  argument: the result or rejection reason. Additionally, the notify
+  callback may be called zero or more times to provide a progress
+  indication, before the promise is resolved or rejected.

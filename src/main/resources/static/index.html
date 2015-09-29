@@ -44,11 +44,12 @@
         </form>
         <!-- editing: -->
         <div ng-show="content[item.id] && editorEnabled">
-            <form name="formedit{{item.id}}" ng-submit="saveedit(item)" role="form">
+            <form name="formedit{{item.id}}" ng-submit="savebutton(item)" role="form">
                 <div class="form-group">
                     <input type="text" ng-model="item.titleField" class="form-control" autofocus="true"><br>
                     <textarea type="text" ng-model="item.contentField" class="form-control"></textarea><br>
                     <input type="submit" id="submit" value="Submit" class="form-control btn btn-warning">
+                    <input  id="cancel" value="Cancel" class="form-control btn btn-warning" ng-click="cancelbutton(item)">
                 </div>
             </form>
         </div>
