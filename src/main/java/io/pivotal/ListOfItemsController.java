@@ -92,7 +92,7 @@ public class ListOfItemsController {
           System.out.println("Invalid argument to postDoneUpdate:  " + done);
         }
         itemRepository.save(item);
-        return "['ok']";
+        return "[\"ok\"]";
     }
 
     // post('/resource/save/<id>/title/content/done/')
@@ -116,7 +116,7 @@ public class ListOfItemsController {
         item.title = title;
         item.content = content;
         itemRepository.save(item);
-        return "['ok']";
+        return "[\"ok\"]";
     }
 
 
@@ -137,4 +137,13 @@ public class ListOfItemsController {
         return item;
     }
 
+
+    /**
+     * A delete method.  In line with traditional REST, we use the post method here.
+     */
+    @RequestMapping(value="/resource/delete/{id}") //, method=RequestMethod.POST)
+    String deleteItem(@PathVariable long id) {
+        itemRepository.delete(id);
+        return "[\"ok\"]";
+    }
 }

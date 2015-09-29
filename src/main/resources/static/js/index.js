@@ -47,6 +47,18 @@ angular.module('index', []).controller('home', function($scope, $http) {
 
 	};
 
+    $scope.godelete = function (item) {
+        $http.post('/resource/delete/' + item.id + '/');
+        // in the future we should get an update from the server, now we just
+        // remove the item ourselves
+        listofitems = $scope.listofitems;
+        for (i=listofitems.length-1; i>=0; i--) {
+            if (listofitems[i].id == item.id) {
+                listofitems.splice(i, 1);
+            }
+        }
+    };
+
 	$scope.plusbutton = function () {
 		$http.get('resource/create/').success(function(newitem) {
 			$scope.listofitems.push(newitem);

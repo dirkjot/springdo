@@ -33,7 +33,7 @@
                 <div ng-show="content[item.id] && !editorEnabled">
                     <p>{{item.content}}</p>
                     <span class="glyphicon glyphicon-pencil" ng-click="goedit(item)"></span>
-                    <span class="glyphicon glyphicon-trash"></span>
+                    <span class="glyphicon glyphicon-trash" ng-click="godelete(item)"></span>
                 </div>
             </div>
             <div class="col-md-6">Done
