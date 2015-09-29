@@ -31,14 +31,14 @@ public class SpringdoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         // save a couple of fake to do items
-        itemRepository.save(new Item("Jack", "Bauer lorem ipsum and a very long story indeed. Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed. "));
-        itemRepository.save(new Item("Chloe", "O'Brian"));
-        itemRepository.save(new Item("Kim", "Bauer"));
-        itemRepository.save(new Item("David", "Palmer"));
-        itemRepository.save(new Item("Michelle", "Dessler"));
+        User defaultUser = userRepository.save(new User("Navya", "secret", "n@example.com"));
+        User secondUser = userRepository.save(new User("t", "t", "t@example.com"));
 
-        userRepository.save(new User("Navya", "secret", "n@example.com"));
-        userRepository.save(new User("t", "t", "t@example.com"));
+        itemRepository.save(new Item("Jack", "Bauer lorem ipsum and a very long story indeed. Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed. ", defaultUser));
+        itemRepository.save(new Item("Chloe", "O'Brian", defaultUser));
+        itemRepository.save(new Item("Kim", "Bauer", defaultUser));
+        itemRepository.save(new Item("David", "Palmer", secondUser));
+        itemRepository.save(new Item("Michelle", "Dessler", secondUser));
 
         userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
         // example of how you would change an existing user, this will throw Illegal State Exception if the username does not exist

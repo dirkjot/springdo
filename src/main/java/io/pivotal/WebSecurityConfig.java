@@ -16,6 +16,8 @@ import java.util.Properties;
 
 @Configuration
 @EnableWebMvcSecurity
+// only exactly one class should have this annotation, and its method (whose name does
+// not matter, will be executed to obtain the settings
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {

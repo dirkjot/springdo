@@ -3,10 +3,11 @@ angular.module('index', []).controller('home', function($scope, $http) {
 	$http.get('resource/list/').success(function(data) {
 		//$scope.greeting = data;
 		//$scope.greeting = {id: 'xxx', content: 'Hello World!'};
+        console.log("/list", data);
 		$scope.listofitems = data; });
 
 	$http.get("resource/who/").success(function(data) {
-		$scope.springdoUserName = data; });
+		$scope.springdoUserName = data["name"]; });
 
 	$scope.onDoneClick = function (item) {
 			//console.log(item.done);
@@ -23,6 +24,7 @@ angular.module('index', []).controller('home', function($scope, $http) {
 		for (var key in $scope.content) {
 			if (key != itemid) {
 				$scope.content[key] = false; }}
+        console.log("expanded", itemid);
 		$scope.content[itemid] = !$scope.content[itemid]; };
 
 

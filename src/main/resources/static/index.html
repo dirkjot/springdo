@@ -9,7 +9,7 @@
 <body>
 <div class="container">
     <div ng-controller="home" ng-cloak class="ng-cloak">
-        <h1>TODO list -{{springdoUserName}}-</h1>  <!-- this does not resolve for some reason -->
+        <h1>TODO list for {{springdoUserName}}</h1>
         <div ng-click="plusbutton()">Plus</div>
         <div class="list-group">
             <div ng-repeat="item in listofitems">

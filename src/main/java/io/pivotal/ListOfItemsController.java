@@ -1,16 +1,14 @@
 package io.pivotal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.Authentication;
 
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.*;
 
@@ -31,8 +29,10 @@ public class ListOfItemsController {
     List listOfItems(Principal principal) {
         // we know they are logged in as spring security is set up that way
         String username = principal.getName();
-        // User user = userRepository.findUserbyName(username);
-        Iterable<Item> iterable = itemRepository.findAll();  // findItembyUser(user);
+        User defaultUser = userRepository.findOne((long) 1);
+        // User user = userRepository.findByName(username);
+        // Iterable<Item> iterable = itemRepository.findAll();
+        Iterable<Item> iterable = itemRepository.findItemByUser(defaultUser);
         List<Item> result = new ArrayList<>();
         iterable.iterator().forEachRemaining(result::add);
         return result;
@@ -64,8 +64,18 @@ public class ListOfItemsController {
      * @return
      */
     @RequestMapping(value="resource/who/")
-    String whoIsLoggedIn(Principal principal) {
-        return principal.getName();
+    String whoIsLoggedIn(Principal principal) throws JsonProcessingException {
+        String name = principal.getName();
+        // angular only wants json hashes as input, we can create one by hand or use the jackson json
+        // library which is already a dependency of spring boot
+        ObjectMapper tojson = new ObjectMapper();
+        Map<String, String> map = new HashMap<>();
+        map.put("name", name);
+        name = tojson.writeValueAsString(map);
+        // we could also just return the name , but do not forget to quote it!
+        // we like to return hashes so we can expand the api at a later time
+        //    name = "\"" + name + "\"";
+        return name;
     }
 
     /**

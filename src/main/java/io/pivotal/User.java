@@ -21,7 +21,7 @@ public class User implements UserDetails {
     public long id;
 
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")  // what this is called on the 'many' side
     private Set<Item> items = new HashSet<>();
 
 

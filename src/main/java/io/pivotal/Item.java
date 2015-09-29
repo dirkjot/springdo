@@ -5,9 +5,9 @@ package io.pivotal;
  */
 
 
-import org.hibernate.annotations.ManyToAny;
-
 import javax.persistence.*;
+
+
 
 @Entity
 public class Item {
@@ -20,12 +20,19 @@ public class Item {
     public String done;
 
     @ManyToOne
-    private User userId;
+    private User user;
 
     public Item(String title, String content){
         this.title = title;
         this.content = content;
         this.done = "no";
+    }
+
+    public Item(String title, String content, User user){
+        this.title = title;
+        this.content = content;
+        this.done = "no";
+        this.user = user;
     }
 
     public Item() {
@@ -37,8 +44,8 @@ public class Item {
     @Override
     public String toString() {
         return String.format(
-                "Item[id=%d, title='%s', done='%s']",
-                id, title, done);
+                "Item[id=%d, title='%s', done='%s', user='%s']",
+                id, title, done, user);
     }
 
 }
