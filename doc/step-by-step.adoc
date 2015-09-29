@@ -404,6 +404,32 @@ Make the delete button work  `/resourece/delete/{itemid}/`
   apparently, js will precompute this.
 
 
+** commit 3deb2b40035dbc5d48ac093eef4de173b6ca9388  cancel button on edit
+
+This one required a little thought: To cancel an edit on a normal item
+is relatively easy because we have our edit fields (titleField, contentField)
+separate from our content field (title, content).  However, when a new
+item is just created, a cancel should remove that item.  For this, we
+created a new variable 'brandnew' (should probably be named
+'deleteOnCancel' or so).  
+
+There is a small cornercase bug in this version:  If you save an edit on a new
+item, then edit it again and cancel that second edit, the item  will
+be deleted.  
+
+** commit 3e5b864a249dfb7f819456bf1ea3ba87b01f1c50  angular update
+
+Angular uses the `$http` function to call back to the server.  In
+earlier versions, these call were chained to `.success` and `.error`
+to run a function on completion of the request.  
+
+In newer version, this is deprecated and `.then(successfun, errorfun)`
+should be used, see
+https://code.angularjs.org/1.4.6/docs/api/ng/service/$http. 
+Note however that the successfun is called with a `success` object
+instead of the data itself.  The data can be found under
+`success["data"]` or `success.data`. 
+
 
 
 **  screenshots
@@ -503,3 +529,4 @@ from brian kelly's crud note video:
   argument: the result or rejection reason. Additionally, the notify
   callback may be called zero or more times to provide a progress
   indication, before the promise is resolved or rejected.
+

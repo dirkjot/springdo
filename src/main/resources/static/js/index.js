@@ -1,11 +1,13 @@
 angular.module('index', []).controller('home', function($scope, $http) {
 
-	$http.get('resource/list/').success(function(data) {
+	$http.get('resource/list/').then(function(success) {
+        data = success.data;
         console.log("/list", data);
 		$scope.listofitems = data; });
 
-	$http.get("resource/who/").success(function(data) {
-		$scope.springdoUserName = data["name"]; });
+	$http.get("resource/who/").then(function(success) {
+        data = success.data;
+        $scope.springdoUserName = data["name"]; });
 
 	$scope.onDoneClick = function (item) {
 			$http.post('/resource/done/' + item.id + '/' + item.done + '/');
@@ -36,6 +38,7 @@ angular.module('index', []).controller('home', function($scope, $http) {
         $http.post('/resource/save/' + item.id + '/' + item.titleField + '/' + item.contentField + '/' + item.done + '/')
             .then(
                 function(success){
+                    item.brandnew = false;
                     item.title = item.titleField;
                     item.content = item.contentField;
                     $scope.editorEnabled = false;},
@@ -77,7 +80,8 @@ angular.module('index', []).controller('home', function($scope, $http) {
     };
 
 	$scope.plusbutton = function () {
-		$http.get('resource/create/').success(function(newitem) {
+		$http.get('resource/create/').then(function(success) {
+            newitem = success.data;
             newitem.brandnew = true;
 			$scope.listofitems.push(newitem);
 			$scope.toggleContent(newitem.id);

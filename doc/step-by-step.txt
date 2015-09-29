@@ -268,6 +268,170 @@ Date:   Wed Sep 23 13:55:06 2015 -0700
 
     added a test for the save end point
 
+
+** commits missed
+
+** commit 4362ab35762d5e1c61351791e85d654c07b986d8 getting users working
+
+*NOTE* this is wrong because we do not actually read the user name, but list
+items of user 1 all the time.  it makes for a great incremental push though.
+
+A few things went into this
+- show userId on list of items
+- filter list of items by user
+- modify example items to have a user. 
+- we have a double representation of our users: THey are persisted in
+  the userRepository (which is currently in an in-memory database, but
+  this can easily be changed).  On application startup, the users are
+  moved to the authentication database in the run method of
+  SpringdoApplication: 
+  : userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
+- we will have to make sure that any operations on users are reflected
+  in both databases, or that we empty and refresh the
+  inMemoryUserDetailsManager after each change.
+- the magic around the login/logout forms is explained over at [[http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#jc-form][Spring
+  Security 101]].  As this all uses thymeleaf and not bootstrap, we will
+  update this shortly. 
+
+*** things learned
+
+- Angular really wants valid json from our endpoints.  Even a single
+  string is valid json (see jsonlint.com), but it has to be quoted. If
+  you forget quotes, you get very interesting errors from within the
+  angular library (something like "syntax error: unexpected token '"
+  etc).  If you use single quotes instead of double quotes, same
+  error. 
+- We opted for return hashes (dictionaries) all the time, as they
+  allow us to later expand on the API without breaking things. 
+- look at the boot extensions to JPA very carefully, as the syntax is
+  a bit finicky and any typo will result in less than helpful error
+  messages (" No property findItembyUser found for type Item!").  We
+  were stuck on ItembyUser vs ItemByUser (correct).  See also this
+  explanation:
+  https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods
+- JPA does some magic so that Items belong to actual user objects, but
+  underlyingly, UserIDs are used.  Just ignore that part, or your JPA
+  code will not work.
+  Our items have `@ManyToOne  private User user;` which shows that
+  many items (the defining class) are mapped to one user.  Our users
+  have `@OneToMany(mappedBy = "user")    private Set<Item> items = new
+  HashSet<>();`. The `mappedBy` shows what this is called on the
+  'many' side. 
+-
+
+
+
+** commit 0da5e06937fb440a09faed60adc0d3fe7ee60561  users fully working, incl new item
+
+- adding admin interface to list all items with user details etc
+- changing user listOfItems to list items of the current user, not
+  user 1
+- adding a new todo should work
+
+*** things learned
+- add this to your application.properties will make the json much more
+  legible (and longer so switch off in production)
+  : spring.jackson.serialization.indent_output=true
+  There are many settings, see [[http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto-customize-the-jackson-objectmapper][spring boot docs]] and [[https://spring.io/blog/2014/12/02/latest-jackson-integration-improvements-in-spring][this blog post]]. 
+- we accidentally had the user as a private property on the unit.
+  this means it will not be serialized, so all our list of items (even
+  for admin) did not have users on them.  
+- once we made user a public property, we see very verbose user
+  reports which include all properties of the users.  We don't need
+  that, just the name is enough
+#+BEGIN_SRC json
+{
+  "id" : 1,
+  "title" : "Jack",
+  "content" : "Bauer lorem ipsum and a very long story indeed. Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed.  Bauer lorem ipsum and a very long story indeed. ",
+  "done" : "no",
+  "user" : {
+    "id" : 1,
+    "password" : "secret",
+    "accountNonExpired" : true,
+    "authorities" : [ {
+      "authority" : "ROLE_USER"
+    } ],
+    "username" : "Navya",
+    "accountNonLocked" : true,
+    "credentialsNonExpired" : true,
+    "enabled" : true,
+    "authdbKey" : "Navya",
+    "authdbValue" : "secret,ROLE_USER,enabled"
+  }
+} 
+#+END_SRC
+
+- the @JsonValue on a User method 'toJson' allows us to do just that,
+  the methods annotated like that will be used to serialize the object
+  instead of the normal approach.
+- However, this means that users are *always* serialized as just the
+  name. That is clearly not what we want, we created a user detail
+  page at `/resource/user/{username}` to show how this goes wrong.
+- One approach is to use the @JsonView methods, which annotate the
+  attributes in the models and the methods on the controllers to
+  specify which attributes should be shown on this view.  
+- Alternatively, we can use @JsonManagedReference, @JsonBackReference
+  but that does not allow us to specify which fields we want to show.
+- We went with annotating all properties in User and Item with either
+  JsonViews.ItemList of JsonViews.UserDetails, and a special abstract
+  class was set up to allow for these two views.
+
+
+*** resources
+- http://www.baeldung.com/jackson-serialize-enums   on how to
+  serialize users in a nice way, they were ignored until we added a
+  @JsonValue to them. 
+- really good overview of how angular works, in only 2 pages:
+  http://tutorials.jenkov.com/angularjs/watch-digest-apply.html
+- post with lots of pointers, and good separation of what you will
+  need to know now vs. tomorrow.
+  http://ruoyusun.com/2013/05/25/things-i-wish-i-were-told-about-angular-js.html
+
+** commit 92c2fe8a3225f23276954830cf489ad280d608ea delete button
+
+Make the delete button work  `/resourece/delete/{itemid}/`
+
+- The backend function was easy, a simple delete on the jpa.  Turns
+  out we can delete by using the full item object, or by using the
+  id.  
+- The front end needs to reflect the deleted item.  Ideally, the back
+  end would post an update, but we don't have that functionality yet
+  so we manually delete the item from our listofitems, using the js
+  `splice` function: `splice(i,1)` removes one item at index `i`.
+  We iterate backwards through listofitems, as the ending condition
+  for forward iteration would have to be changed as we go and
+  apparently, js will precompute this.
+
+
+** commit 3deb2b40035dbc5d48ac093eef4de173b6ca9388  cancel button on edit
+
+This one required a little thought: To cancel an edit on a normal item
+is relatively easy because we have our edit fields (titleField, contentField)
+separate from our content field (title, content).  However, when a new
+item is just created, a cancel should remove that item.  For this, we
+created a new variable 'brandnew' (should probably be named
+'deleteOnCancel' or so).  
+
+There is a small cornercase bug in this version:  If you save an edit on a new
+item, then edit it again and cancel that second edit, the item  will
+be deleted.  
+
+** commit 3e5b864a249dfb7f819456bf1ea3ba87b01f1c50  angular update
+
+Angular uses the `$http` function to call back to the server.  In
+earlier versions, these call were chained to `.success` and `.error`
+to run a function on completion of the request.  
+
+In newer version, this is deprecated and `.then(successfun, errorfun)`
+should be used, see
+https://code.angularjs.org/1.4.6/docs/api/ng/service/$http. 
+Note however that the successfun is called with a `success` object
+instead of the data itself.  The data can be found under
+`success["data"]` or `success.data`. 
+
+
+
 **  screenshots
 
 project structure settings
@@ -346,3 +510,23 @@ iterable.iterator().forEachRemaining(result::add);
 //        super.addResourceHandlers(registry);
 //
 //    }
+
+* to implement later
+from brian kelly's crud note video:
+- endpoints should change to Create->/notes POST, Read /notes/Id GET,
+  Update /notes/Id POST, Delete ..?
+- use @lob annotation on large jpa fields (ie content)
+- uses pegdown to allow markdown
+- polling the server for changes etc.     for a start, see polling
+  example: http://jsfiddle.net/rishabh/Kuewm/
+- The $http legacy promise methods success and error have been
+  deprecated. Use the standard then method
+  instead. https://docs.angularjs.org/api/ng/service/$http
+- then(successCallback, errorCallback, notifyCallback) – regardless of
+  when the promise was or will be resolved or rejected, then calls one
+  of the success or error callbacks asynchronously as soon as the
+  result is available. The callbacks are called with a single
+  argument: the result or rejection reason. Additionally, the notify
+  callback may be called zero or more times to provide a progress
+  indication, before the promise is resolved or rejected.
+
