@@ -21,6 +21,126 @@
 # screen recording with quicktime player, screen set to 1600x900 (display), b/w
 # (access* Spring Boot
 
+
+* What are we going to do?
+
+*TLDR* Jump to [[*Starting the project]]
+
+In this series of tutorials, we will be building a simple application,
+a dynamic website with Spring Boot in the back end and AngularJS in
+the front end.  You can apply this knowledge easily to another front
+end, such as backbone or react.  
+
+This tutorial is written for people who are relatively
+new to Spring and maybe even to Java.  I have written it in such a way
+that it should be easy to skip parts if you have a background in
+this.  I aim to make short video clips that show the most complex
+steps in more detail than I can write about them. 
+
+There are many tutorials out there on Spring and websites.  What sets
+this one apart?
+- Focus on current state (2015):  Using Spring Boot not plain Spring; no XML files but
+  annotations; using Angular 1.4 (even though 2.0 is out), using
+  IntelliJ 14 (but Eclipse, STS will also work).
+- Focus on story based work, we create a small backlog of stories and
+  will deal with them in turn.
+- Test driven development: Even though this is our aim we had to stay
+  away from this a little bit to not overcomplicate this project.  We
+  will try to test the Spring part of the application rigorously, but
+  the Angular parts will be tested more informally.
+- Warts and all:  Instead of showing the "best soution" right away,
+  the tutorial will also highlight various caveats and not so good
+  solutions.  After all, knowing what *not* to do will save you time. 
+- Lots of links: I'll try to keep this document short by linking to
+  more in depth content throughout.
+
+
+
+* Conventions
+
+"Too long; didn't read" is often abbreviated *TLDR* here and has an [[https://en.wikipedia.org/wiki/Wikipedia:Too_long;_didn%27t_read][interesting
+background]].  I use "*TLDR* <short verson> / <long paragraph>" to help you
+navigate the content; It is  an example of bottom line up front, if you want. 
+
+
+*Lesson Learned* marks a discussion of the path we have chosen here.  In a few
+places, our first choices were not optimal but we kept them to also show you how
+*not* to do this. In these 'side bars', we discuss the other alternatives and
+optionally point to where we will later convert to a better solution.
+
+*User Story* Development should be driven by the requirements of the end user.
+For a tutorial, this does not hold true completely, but where possible I will
+start and finish a user story to make it clear what functionality we are trying
+to implement. 
+
+* Let's put that into practice: background reading
+
+If you are new to Angular and Spring, it may be good to read up on
+your terminology.  The very top of [[https://code.angularjs.org/1.4.7/docs/guide/concepts][this Angular help page]] has a great
+table with key terms like Controller, Model, Dependency injection
+etc. 
+
+Dependency injection is so important that you should read this
+[[https://en.wikipedia.org/wiki/Dependency_injection][Wikipedia article]] about it.  If that leaves things a little abstract,
+don't worry we will deal with that shortly.  Don't google dependency
+injection in Angular now, as it looks confusing but is super easy to
+use.
+
+You could read up on this [[http://docs.spring.io/spring-framework/docs/4.2.1.RELEASE/spring-framework-reference/html/mvc.html][conceptual overview of Spring MVC]], but I
+started without that knowledge.  If you read this you will notice that
+Spring's official documentation is good but hard to read for
+beginners: Very long pages, not enough separation between core content
+and 'also interesting', and lots of jargon.  Once you know Spring
+better, these pages can be very helpful.
+
+I like Gradle better than Maven, but Maven is the standard for Spring right
+now.  You can do the tutorial with Gradle but expect some googling.  You can
+easily convert to gradle at any time.  
+
+* Caveats about Spring
+
+*TLDR* do not use XML files. / Spring has been around for a long time and has
+evolved quite a bit.  The major example would be the use of XML files to glue
+code together: Once required, now superceded by the =@Controller=, =@Autowired=
+etc annotations.
+
+*TLDR* Look for recent internet hits only. / This means that looking for help on
+Spring can be frustrating, as you will find hints that no longer apply with a
+more modern approach.  A terrible experience is guaranteed when you modify your
+project to match the help you found, you will end up with an outdated Spring
+setup that will give you headaches.  So leave major parts of the application
+(like the main application class) alone if you can.
+
+There is often only more than one way to do something in Spring.  In fact, there
+seem to be countless ways. 
+
+* Starting the project 
+
+*TLDR* We use start.spring.io to start a project / 
+Let's get started.  There are a number of ways to start a Spring project (as
+with all things Spring).  
+- The Spring 'Initializr' at start.spring.io will create a download for you, this is what we will use
+- IntelliJ provides a wizard for a Spring project. We found that it didn't set
+  up some things right (even though it uses start.spring.io under the hood)
+- STS has a start wizard which should work fine
+- You can start from a maven or gradle file, but that is too complicated for us.
+- You can install and run Spring Command line, which is great but too complicated.
+
+So go to [[http://start.spring.io]] and type in some details for your project
+- Give your project a nice name, we use Springdo.  Enter this name under 'name'
+  and 'artifact' (the name of the jar you will be making)
+- Use a reverse domain name, like 'org.demo' or 'io.pivotal'. Enter this under
+  'group' and 'package name' (confusing terminology there).
+- Choose a 'maven project' as the 'type'
+- Under dependencies, check 'Web', 'JPA', 'HSQLDB'
+
+#+BEGIN_video
+*Video* Using initializr [[https://youtu.be/eQowzb6F-8w][Springdo-1-v1]]
+# Video link: Using initializr  [[videos:Springdo-1-v1]]  
+#+END_video
+
+* Spring Boot
+
 What is the difference between Spring Boot and plain Spring?  Spring Boot is
 built on top of Spring as a runtime configuration utility.  Spring will look in
 your environment (classpath) and automatically configure the project for
