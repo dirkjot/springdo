@@ -54,6 +54,7 @@ this one apart?
   more in depth content throughout.
 
 
+
 * Conventions
 
 "Too long; didn't read" is often abbreviated *TLDR* here and has an [[https://en.wikipedia.org/wiki/Wikipedia:Too_long;_didn%27t_read][interesting
@@ -117,7 +118,7 @@ seem to be countless ways.
 *TLDR* We use start.spring.io to start a project / 
 Let's get started.  There are a number of ways to start a Spring project (as
 with all things Spring).  
-- The Spring Initializr at start.spring.io will create a download for you, this is what we will use
+- The Spring 'Initializr' at start.spring.io will create a download for you, this is what we will use
 - IntelliJ provides a wizard for a Spring project. We found that it didn't set
   up some things right (even though it uses start.spring.io under the hood)
 - STS has a start wizard which should work fine
@@ -137,6 +138,27 @@ So go to [[http://start.spring.io]] and type in some details for your project
 # Video link: Using initializr  [[videos:Springdo-1-v1]]  
 #+END_video
 
+* Spring Boot
+
+What is the difference between Spring Boot and plain Spring?  Spring Boot is
+built on top of Spring as a runtime configuration utility.  Spring will look in
+your environment (classpath) and automatically configure the project for
+you. However, 
+1. Spring Boot only works when you have not supplied configuration yourself,
+2. Spring Boot uses runtime configuration (via dependency injection)
+
+So if you run your project and it does not specify a webserver to use,
+Spring Boot will take the first webserver it can find on your classpath and make
+your project use it.  Spring Boot does not create any
+configuration files, which means you can add a webserver configuration at any
+time and Spring Boot will stop supplying one. 
+
+In this project, we will not specify a webserver.  One of the project
+dependencies (checkbox 'Web') will pull in Tomcat, which will be autoconfigured
+by Boot.  Similarly, we will not write any configuration for a database, but
+because we selected 'HSQLSB' as a dependency, Spring Boot will configure that
+database for us, using 'JPA' as an interface.
+
 * Import and run
 
 Next, open IntelliJ and import the project by choosing 'import' and navigating
@@ -145,7 +167,7 @@ the maven projects (checkbox) and to automatically download the sources
 (checkbox).  I prefer the 'ipr based' project format.
 
 On the next page, check the one project that can be imported.  On the page after
-that, assure there is a JVM to use, and that it is java 1.8.  Install Java and
+that, ensure there is a JVM to use, and that it is java 1.8.  Install Java and
 point IntelliJ to it if this step is not set up right (Tip: on a Mac, use or
 google =brew cask install java=).   In this example, I store the new project in a different
 location (Documents/localcode) from where I imported it from (Downloads).
