@@ -49,3 +49,6 @@ tried this in the hope that it would create relative links.  it does but blogger
 ("tut" :components ("org-notes" "tut-static"))
 ))
 
+
+* things to do
+** TODO write js to fix internal links
