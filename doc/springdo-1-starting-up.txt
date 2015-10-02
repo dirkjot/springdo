@@ -1,0 +1,127 @@
+                                          
+
+* settings 							   :archive:noexport:
+
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t num:nil toc:t
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+INFOJS_OPT:
+#+LATEX_HEADER:
+
+# replace this for production:
+#+LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# screen recording with quicktime player, screen set to 1600x900 (display), b/w
+# (access* Spring Boot
+
+What is the difference between Spring Boot and plain Spring?  Spring Boot is
+built on top of Spring as a runtime configuration utility.  Spring will look in
+your environment (classpath) and automatically configure the project for
+you. However, 
+1. Spring Boot only works when you have not supplied configuration yourself,
+2. Spring Boot uses runtime configuration (via dependency injection)
+
+So if you run your project and it does not specify a webserver to use,
+Spring Boot will take the first webserver it can find on your classpath and make
+your project use it.  Spring Boot does not create any
+configuration files, which means you can add a webserver configuration at any
+time and Spring Boot will stop supplying one. 
+
+In this project, we will not specify a webserver.  One of the project
+dependencies (checkbox 'Web') will pull in Tomcat, which will be autoconfigured
+by Boot.  Similarly, we will not write any configuration for a database, but
+because we selected 'HSQLSB' as a dependency, Spring Boot will configure that
+database for us, using 'JPA' as an interface.
+
+* Import and run
+
+Next, open IntelliJ and import the project by choosing 'import' and navigating
+to the pom.xml.  Make sure to have the Idea/IntelliJ project automatically read
+the maven projects (checkbox) and to automatically download the sources
+(checkbox).  I prefer the 'ipr based' project format.
+
+On the next page, check the one project that can be imported.  On the page after
+that, ensure there is a JVM to use, and that it is java 1.8.  Install Java and
+point IntelliJ to it if this step is not set up right (Tip: on a Mac, use or
+google =brew cask install java=).   In this example, I store the new project in a different
+location (Documents/localcode) from where I imported it from (Downloads).
+
+Once the project has been imported, we want to run it.  The easiest way to set
+up a 'run configuration' is to find the main application, right click it and
+choose Run with the Spring icon (a pointy leaf).  The server will start at
+=localhost:8080= but it will only give us the standard error page (whitelabel
+error page) as we haven't done any coding yet. 
+
+#+BEGIN_video
+*Video* Opening the IntelliJ project and start Spring [[https://www.youtube.com/watch?v=LIsqQcGdqL0][Springdo-1-v2]]
+# Video link: Opening the IntelliJ project and start Spring [[videos:Springdo-1-v2]]  
+#+END_video
+
+* A first controller
+
+#+BEGIN_userstory
+*User Story* When I open the site, I want to see a list of my todo items
+#+END_userstory
+
+An error page hardly counts as content, so let's write a first controller.  A
+controller is a piece of code that creates a view.  A view is something that the
+users sees in their browser.  As there are no todo items yet, we can simply
+present the user with an empty page. (At this point, we assume there is only one
+user and no login process. We will fix that later).
+
+A controller is a class, and this controller is responsible for the list of
+items at the main page.  We annnotate the class with =@RestController=, which
+does a couple of things:
+- This is a controller, so it will be responsible for endpoints such as =/=,
+  =/about= and similar
+- As a controller, it is requesting dependency injection.  We will talk about
+  that when it comes in (not yet)
+- A normal =@Controller= will always output an html template that needs to be
+  filled in.  A =@RestController= is made for JSON output, and the templating
+  engine is not used.  We abuse that here to render raw HTML as a string,
+  something you would only do in a demo.
+
+The method =mainPage= is reponsible for the main page at =localhost:8080/=. It
+is a function without arguments that returns some raw html.  Above it, we tell
+Spring to which endpoint this will be connected.  If you are coming from Rails
+or Django, it may seem strange to mix the code (=mainPage=) and the routing (=/=
+maps to =mainPage=) in the same file.  
+  
+#+BEGIN_SRC java
+package io.pivotal;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ListOfItemsController {
+
+    @RequestMapping(value = "/", method= RequestMethod.GET)
+    public String mainPage() {
+        return "<html><body><h1>List of ToDO items</h1></body></html>";
+    }
+}
+#+END_SRC
+
+If you refresh your browser you should now see an empty todo list.
+Congratulations!  User story finished. 
+
+
+
+
+* emacs settings  :archive:noexport:
+
+Local Variables:
+mode: org
+fill-column: 80
+eval: (auto-fill-mode t)
+End:
+

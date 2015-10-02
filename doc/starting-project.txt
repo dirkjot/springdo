@@ -1,0 +1,56 @@
+                                      -*- mode: org -*-
+
+
+HOW TO SET UP INTELLIJ WITH HOMEBREW JAVA 8 ON OS-X
+
+
+* Install IntelliJ
+We used Ultimate version 14,  but the Community version should also
+work. Install IntelliJ to its default location, which should be
+`/Applications/IntelliJ IDEA 14.app` (possibly with a different
+version number for you)
+
+* Install Java8
+
+We install it using homebrew, which has an extension called `cask` for
+downloading binary files (java is not compiled from source but
+provided by Oracle)
+: brew cask install java
+
+Check whether it works
+: java -version
+
+If this does not work, you may to update brew & install cask
+: brew update
+: brew upgrade
+: brew tap caskroom/cask
+: brew install brew-cask
+
+* Fix IntelliJ to work with Java8
+
+For some dark reason, IntelliJ does not want to work with the
+(homebrew) java 8.  You have to instruct it to be cooperative
+(modified from [[http://flurischt.ch/run-intellij-idea-14-on-osx-with-java-8.html][this post]])
+
+: mkdir ~/Library/Preferences/IntelliJIdea14/
+: cp -i /Applications/IntelliJ\ IDEA\ 14.app/Contents/bin/idea.properties ~/Library/Preferences/IntelliJIdea14/
+
+Now modify ~/Library/Preferences/IntelliJIdea14/idea.properties and
+change the JVMVersion from `1.6*` to `1.8*`, or run this little sed
+script that does that for you:
+: sed  -i -e 's/JVMVersion=1.8.*$/JVMVersion=1.8*/g' ~/Library/Preferences/IntelliJIdea14/idea.properties
+
+
+Open the IntelliJ editor and open your project.  Now make sure the
+'Project SDK' is pointing at the right place: 
+- Open the 'project structure' dialog (Under the file menu, and there
+  are several shortcuts). 
+- Go to `project settings`, `project`, the top
+  item should be `project sdk`.  
+- If this is unset, add a new sdk , choose type `jdk` and point the
+  chooser to `/Library/Java/JavaVirtualMachines/jdk.1.8.0_60.jdk` (or
+  similar, depending on the exact release you are using).
+
+
+
+

@@ -1,0 +1,51 @@
+
+* repo
+
+** branches
+
+tried to move the master branch to history and such, but this creates a lot of confusion.  
+
+* procedure
+
+- create org file with txt extension
+- export to html
+- view and copy all html
+- in blogger , paste it in (maybe first go to html, delete all, back to normal)
+- fix links in html mode
+- hit publish in html mode
+
+* relative links
+
+all links in blogger that point into the same doc are broken .  this seems to be a known blogger issue since 2010.
+
+FIX: go into html mode and edit the links. do not switch back to normal mode before hitting publish. 
+
+
+** publish
+
+tried this in the hope that it would create relative links.  it does but blogger still butchers them to be absolute to a wrong address. 
+
+(require 'ox-publish)
+(setq org-publish-project-alist
+      '(
+      ("tut-notes"
+        :base-directory "/Users/pivotal/Google Drive/code/springdo.hub0"
+        :base-extension "txt"
+	:publishing-directory "/Users/pivotal/Google Drive/code/publish"
+	 :recursive t
+	  :publishing-function org-html-publish-to-html
+ 	  :headline-levels 4             ; Just the default for this project.
+	  :html-link-use-abs-url nil
+ 	  :auto-preamble t )
+
+("tut-static"
+  :base-directory "/Users/pivotal/Google Drive/code/springdo.hub0"
+ :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+ :publishing-directory "~/public_html/"
+ :recursive t
+ :publishing-function org-publish-attachment
+ )
+
+("tut" :components ("org-notes" "tut-static"))
+))
+
