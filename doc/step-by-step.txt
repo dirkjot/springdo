@@ -1,6 +1,27 @@
                                      -*- mode:org -*-
 
 
+* General things about spring
+
+components (from http://www.codejava.net/frameworks/spring/spring-mvc-beginner-tutorial-with-spring-tool-suite-ide)
+- Spring’s dispatcher servlet: acts as a front controller between the Spring
+  application and its clients. The dispatcher servlet intercepts all requests
+  coming to the application and consults the Handler Mapping for which
+  controller to be invoked to handle the requests. 
+- Handler Mapping: is responsible to find appropriate controllers that handle
+  specific requests. The mapping between request URLs and controller classes is
+  done via XML configuration or annotations. 
+- Controller: is responsible to process the requests by calling other
+  business/service classes. The output can be attached to model objects which
+  will be sent to the view. To know which view will be rendered, the controller
+  consults the View Resolver. 
+- View Resolver: finds the physical view files from the logical names.
+- View: physical view files which can be JSP, HTML, XML, Velocity template,
+  etc. 
+ 
+
+
+
 * Creating a To Do list with the Sping Framework
 
 
