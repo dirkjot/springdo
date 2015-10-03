@@ -1,0 +1,33 @@
+                                          
+
+* settings 							   :archive:noexport:
+
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t num:nil toc:t
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+INFOJS_OPT:
+#+LATEX_HEADER:
+
+# replace this for production:
+#+LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# screen recording with quicktime player, screen set to 1600x900 (display), b/w
+# (access* Spring Boot
+
+
+
+* emacs settings  :archive:noexport:
+
+Local Variables:
+mode: org
+fill-column: 80
+eval: (auto-fill-mode t)
+End:
+
