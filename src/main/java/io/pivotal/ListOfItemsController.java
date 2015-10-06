@@ -22,12 +22,14 @@ public class ListOfItemsController {
         map1.put("id", "1");
         map1.put("title", "Go for a swim");
         map1.put("content", "Go swimming on Monday night");
+        map1.put("done","yes");
         result.add(0, map1);
 
         Map<String, String> map2 = new HashMap<String, String>();
         map2.put("id", "2");
         map2.put("title", "Visit farmer's market");
         map2.put("content", "Buy dairy and eggs at farmers market on Wednesday");
+        map2.put("done","no");
         result.add(1, map2);
 
         return result;
