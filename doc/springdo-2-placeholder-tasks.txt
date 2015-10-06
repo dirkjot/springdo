@@ -15,13 +15,450 @@
 #+INFOJS_OPT:
 #+LATEX_HEADER:
 
-# replace this for production:
+# video links, replace this for production:
+# insert with <y TAB
 #+LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# github links, insert with <g TAB
+#+LINK: github https://github.com/dirkjot/springdo/commit/%s
+
 
 # screen recording with quicktime player, screen set to 1600x900 (display), b/w
 # (access* Spring Boot
 
+* Making it official
 
+First of all, you need a [[https://github.com/dirkjot/springdo][github repo]] for any code.  The repository has three
+branches (at the time of writing):  Tutorial is the default branch and follows
+these posts.  Master contains the code and the commit as they happened when we
+originally wrote it, and documentation contains the source to these blogposts
+(in emacs [[http://orgmode.org][org-mode]] format).  
+
+I will be tagging the repository to indicate where the blog posts are.  The
+format is =springdo-1-final=, indicating the code at the end of tutorial 1.
+Any intermediate commits will be named, like =springdo-2-tests= (which we will
+commit later after we have implemented the tests).
+
+#+BEGIN_commit
+ [[github:a6a570c48bee85ee367064265298a477d18c58e0]]
+#+END_commit
+
+
+* A new user story
+#+BEGIN_userstory
+*User Story* When I open the site, I want it to look nice and be interactive and
+ responsive.
+#+END_userstory
+
+I have created artificially simple stories here, but for a tutorial like this it
+is nice to take /baby steps/.
+
+* Adding AngularJS and Bootstrap
+
+*TLDR* We include our own css and js files with AngularJS, Bootstrap and jQuery.
+
+Spring is written in java and runs on servers, providing the back end to a web
+application.  Spring can serve static webpages and it can also use a templating
+system to create personalized pages ("Hello Mr <insert name here>").  However,
+modern web applications want to be interactive and responsive, just like desktop
+programs and apps.  
+
+This can be accomplished by using a front end framework that helps you create a
+separate [[https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller][model-view-controller system]] in the user's browser: This system will run
+in javascript (the only programming language that browsers support) and have
+javascript models of our data that will be rendered to user views by the front
+end framework.  The main advantage of this approach is speed: The front end
+framework can immediately update the browser and notify the server (Spring) at
+its leasure.  AngularJS is one such framework, we chose it because of its
+popularity.
+
+Whereas [[http://angularjs.org][AngularJS]] is concerned with interactivy, [[http://getbootstrap.com][Bootstrap]] is concerned with the
+[[https://en.wikipedia.org/wiki/Responsive_web_design][responsiveness]]:  It creates a grid on your webpage and it will rearrange items
+to fit any size of screen.  We won't spend much time with the (excellent)
+Bootstrap package here but just use it.
+
+Now we could just simply include a reference to these packages in our page,
+using the free CDN ([[https://en.wikipedia.org/wiki/Content_delivery_network][content delivery network]]) copies that Google and Twitter
+provide.  However, in real applications that is rarely done because you want to
+provide your own version of these tools for various reasons.  Our own version
+combines all the necessary files in two files: One js file and one css file,
+which were made using a tool called [[https://github.com/wro4j/wro4j][wro4j]] (steps detailed in the same [[https://spring.io/blog/2015/01/12/spring-and-angular-js-a-secure-single-page-application#front-end-assets][Spring]]
+Tutorial).  One more advantage, during development we will be loading and
+reloading the page often and having a local copy makes this faster.
+
+* Creating a test page
+
+Let's create a page called 'hello-angular.html'.  We create this page under
+=src/main/resources/static=: Any pages in that directory will show up under the
+root (=/=) of our server, so this page will show up as
+=localhost:8080/hello-angular.js=.
+
+#+BEGIN_SRC html
+# hello-angular.html
+<body ng-app="hello">
+<div class="container">
+    <h1>Greeting</h1>
+    <p>
+        If this is formatted nicely and shows 'the ID is' below, angular and bootstrap are
+        working.   You need an endpoint at /resource for actual ID values to show up here, but
+    we don't worry about that now </p>
+
+    <div ng-controller="home" ng-cloak class="ng-cloak">
+        <p>The ID is {{greeting.id}}</p>
+        <p>The content is {{greeting.content}}</p>
+    </div>
+</div>
+<script src="js/angular-bootstrap.js" type="text/javascript"></script>
+<script src="js/hello.js"></script>
+</body>
+#+END_SRC
+
+The =ng-app= directive on =body= tells Angular to parse the html of our page and
+do its magic with it.  It also tells us that the controller(s) for this page
+will be called 'hello', which would normally be found in a file =hello.js=.
+Standard html follows, as one of the nicest things of angular is that it is
+valid html.
+
+Things are getting more interesting around the =<div ng-controller= part: Here
+we tell angular that this div should be connected to the =home= controller.  The
+=cloak= directives are there to make sure the page doesn't flash while loading.
+Finally, we see double curlies  (moustaches) in the text, inserting the value of
+javascript objects =greeting.id= and =greeting.content= in the html.  
+
+The corresponding js looks like this:
+
+#+BEGIN_SRC javascript
+# hello.js
+angular.module('hello', [])
+    .controller('home', function($scope, $http) {
+            //$http.get('resource/hello').then(
+            //        function(success) {
+            //            $scope.greeting = success.data; });
+            $scope.greeting = {id: 'xxx', content: 'Hello World!'};
+});
+#+END_SRC
+
+# TODO is this safe from minifying because we don't use the array notation?
+
+In the js, we create a module 'hello', which has one controller 'home' under
+it. This controller will later contact an endpoint on our server, but that code
+is commented out for now. For now it assignes a hard coded value to the greeting object.
+To make sure that any assignment persists after the controller function completes, we
+have to modify variables on the =$scope=, so we write =$scope.greeting=.     
+
+There is much more to learn about AngularJS but this is hopefully clear enough
+to (roughly) understand what this does.  Proceed by commenting out the hard
+assignment to greeting and putting the =$http.get= back in.  Run the resulting
+code. 
+
+Remember we talked about dependency injection in AngularJS earlier?  Here we see
+it in action: The 'home' controller is a function (like most things in
+javascript), but when it is invoked its arguments will be filled with a
+reference to the global scope and a reference to a service that can do http GET
+requests.  What those things are and where they come from is of no interest to
+us now, AngularJS will make sure they are there and will pass us a reference to
+them: Dependency injection.
+
+If you look at the [[https://docs.angularjs.org/api/ng/service/$http][AngularJS help pages for =$http=]], you will see that this
+service returns 'promises' (well explained in the [[https://spring.io/understanding/javascript-promises][spring documentation]]).  A
+promise returns right away, allowing the program to continue so your browser
+won't hang.  But the actual response from the backend may take a while and this
+is where the magic of a promise comes in: The =then= function will be activated
+at some point: If the data comes in, the first function will be run.  If a
+timeout or error occurs, the (optional) second function is run (not used
+here). 
+
+When we visit the page, AngularJS will call the 'home' controller to resolve the
+={{meeting.id}}= reference.  However, the endpoint =resource/hello= does not
+exist yet on the Spring backend and the http function fails. You can see this if
+you open the browser's console, a 404 error is shown on that endpoint.  For a
+normal user, the webpage looks fine other than that no ID or content is shown.
+This is another nice property of AngularJS: When things don't work, the webpage
+breaks down gracefully.  We will later see how to put a default value in the
+=meeting.id=, something like "Retrieving ID..".  You can also try to put a nice
+pop-up message in by extending the =.then= function with a failure function.
+
+Back at the back end, let's make it so 'hello-angular.html' does not break and
+write a controller that returns a valid id and content at =resource/hello=:
+
+#+BEGIN_SRC java
+# HelloController.java
+@RestController
+public class HelloController {
+
+    @RequestMapping(value = "/resource/hello")
+    public Map hello () {
+        Map<String, String> map1 = new HashMap<String, String>();
+        map1.put("id", "1");
+        map1.put("content", "Go swimming on Monday night");
+        return map1;
+    }
+}
+#+END_SRC
+
+Again, we tell Spring that we have a controller that does not use any templating
+(RestController) and that its first method covers a specific endpoint
+(RequestMapping).  Now in Python or Ruby, this function would have simply been:
+: return { "id": 1, "content": "Go swimming on Monday night" }
+but in Java we have to actually construct a map and run =put= on it.  If you
+restart the servedr and reload the page, you should see our template page with
+id and content filled in.
+
+As an experiment, you can remove the comments so that our hello controller (over
+at the AngularJS side) assigns two placeholder values to =$scope.greeting=.  Observe what
+happens: The screen flickers as the placeholder values get replaced by the real
+values.  You can make that more obvious by putting a =Thread.sleep(5000);= (plus
+java boilerplate, let IntelliJ do the work for you) in
+the HelloController.java class, simulating a very busy server which takes a
+while to get back to you.  Now you will see 'ID: xxx' for a few seconds, at
+which point it gets replaced by 'ID: 1' (see the video below if you need help
+with this).  
+
+Just like other templating systems, AngularJS will insert the value of
+'greeting.id' into our html when the page gets rendered.  Unlike older
+frameworks, AngularJS will actually monitor the 'greeting' variable and update
+the page whenever the variable is changed.  This is also true for user
+interactions: If we bind a user input field to a javascript variable, the field
+will start out displaying the variable's content *and* the variable's content
+will immediately reflect any changes the user is making to the input field.
+
+#+BEGIN_video
+*Video* AngularJS is constantly updating the page [[https://youtu.be/YPvvXKfeOFY][Springdo-2-v1]
+#+END_video
+
+This doesn't actually solve the user story, as we have created a demo page for
+this and not modified our main page.  But is is a clear milestone for us and we
+are confident that we can apply these same changes to our list of items, so we
+move on given that the next story also involves that list of items.
+
+#+BEGIN_commit
+ [[github:4148f6325e28f6c1cd08c86e789c585a546a22b9]]  
+#+END_commit
+
+
+* Placeholder items from the server
+
+#+BEGIN_userstory
+*User Story* When I open the site, I want to see a list of two (placeholder) todo items
+#+END_userstory
+
+An empty site was nice, but our user wants more.  If we do /the most minimal
+things that works/, we would simply add to the html that we hardcoded in the
+last tutorial.  We are going to do something slightly more complicated this time
+and serve these two placeholder items from the backend (Spring) using the
+knowledge we just acquired about how AngularJS and Spring can work together via
+=$http=.  
+
+Specifically, 
+- The webpage at =/= will display the list of todo items (zero or more).
+- The webpage will be very similar to the 'hello-angular' example we wrote
+  above
+- The Spring backend will publish a list of todo items in json format at the
+  endpont =/resource/list/=.
+
+
+As we are going to modify the backend, we can use the preferred Pivotal methodology:
+Writing a test before we write the code.  Tests go in a specific place in the
+hierarchy and are usually called after the controller they test. Here is the
+full code of 'ListOfItemsControllerTest':
+
+
+#+BEGIN_SRC java -n
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SpringdoApplication.class)
+@WebAppConfiguration
+public class ListOfItemsControllerTest {
+
+    private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext context;
+
+    @Before
+    public void setUp() throws Exception {
+        /* do not use standAloneSetup, as it is not good for web apps */
+        mvc = MockMvcBuilders.webAppContextSetup(context).build();
+    }
+
+    @Test
+    public void whenDefaultPlaceholdersLoadedTwoTasksShouldShow() throws Exception {
+        // note that we are only testing spring json output, we are assuming angular shows this 
+        // nicely on the user's page
+
+        // we assume that our first version always has two tasks:
+        // id1 / title: Go for a swim  / Content:  Go swimming on Monday night
+        // id2 / title: Visit farmer's market / Content: Buy dairy and eggs at farmers market on Wednesday
+
+        mvc.perform(get("/resource/list"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is("1")))
+                .andExpect(jsonPath("$[1].id", is("2")))
+                .andExpect(jsonPath("$[0].title", containsString("swim")))
+                .andExpect(jsonPath("$[1].title", containsString("market")))
+                .andExpect(jsonPath("$[0].content", containsString("swimming on Monday")))
+                .andExpect(jsonPath("$[1].content", containsString("dairy and eggs")));
+    }
+}
+
+#+END_SRC
+
+
+
+This test uses the Spring Test framework, for which we have to adjust our
+dependencies in a minute.  What the framework does is quite clear and this is
+largely boilerplate that you can copy between tests:
+- (line 1) We state we want to use the standard spring unit test runner
+- (line 2) We tell the test that it should run with the same configuration as our normal
+  application (this may slow things down a bit, but it is the easiest)
+- (line 3) We tell the test framework that this is a web app test
+- (line 6) For the test, we use a mocked web framework (MVC)
+- (line 8) Next, we want to have a WebApplicationContext (which is necessary for Spring
+  to run).  Instead of finding it ourselves, we ask Spring to inject it with the
+  =@Autowired= annotation.   
+- (line 11) Before we run any tests, we fill the =mvc= object with a mocked web app
+  created from the context we were given via dependency injection.
+- You will also see tests against 'standAloneSetup' (which is faster).  Do not
+  use that as things will break in weird ways if you are working with a web app.
+
+After all of this, we are ready to run a test.  Each test has to be annotated
+with =@Test= and in [[https://en.wikipedia.org/wiki/Behavior-driven_development][Behavior Driven Development style]], the name of the test is a
+sentence that describes the business value that we are testing.  In line 26, we
+ask the test runner to go to localhost =/= and retrieve the response.  At this
+point, the test runner will have started the server for us so this should return
+a page with a list with two items, as in the user story.  
+
+#+BEGIN_commit
+ [[github:96aa56af87040b18d149ec69a3ad368b99677142]]
+#+END_commit
+
+We continue to test various aspects of that page, first we ensure it is read and
+returns status Ok.  We also print out the full response with =andDo=. Then we
+use the 'jsonPath' library to test various aspects of the json:
+- (line 29): that it is a list with two elements
+- (line 30): that the 'id' of the first item is 1, and the second is 2
+- and that titles and contents are set correctly
+
+Please run this test and see it fail, as we have not implemented this yet (this
+seems silly but it is a good practice, every now and then you will accidentally
+write a test that your code already satisfies; there could also be an error in
+your test). 
+ 
+In fact, running the test reveals that it fails for the wrong reasons: we still
+have to pull in a dependency and we get an error like
+=java.lang.NoClassDefFoundError:= =com/jayway/jsonpath/InvalidPathException=. 
+You can go to the =pom.xml= file and use IntelliJ's 'Generate' function to
+include a new dependency.  Make sure the Maven repository has been read by
+IntelliJ so you can simply search for 'jsonPath' and insert it. 
+
+#+BEGIN_video
+*Video* Adding the jsonPath dependency in the pom.xml, using IntelliJ [[https://youtu.be/YPvvXKfeOFY][Springdo-2-v1]
+#+END_video
+
+#+BEGIN_commit
+ [[github:d4e8fb7820143799408e2f50f73cbd2aab1d7162]]
+#+END_commit
+
+
+* Implementing the item list endpoint
+
+After this successfully failed test, we will actually implement the endpoint.
+It may be worth it to sketch the solution yourself before reading on, it is
+actually not that hard and a good test of your understanding of Spring so far.
+The previous commit has the test in it, so you can run your code against that
+test.
+
+The function is not hard to write once you look at the 'HelloController' above: 
+- again we have a =@RestController=, as we do not want any templating on the
+  Spring side
+- we can call our method anything, I called it 'simpleminded' because it is not
+  a very sustainable approach to a todo server
+- annotate the method with a endpoint via =@RequestMapping=.
+- this time, we return a list of dictionaries, one for each todo item.  This
+  means our class returns the java monstrosity =List<Map<String, String>>= but
+  it is otherwise the same as above.
+
+#+BEGIN_SRC java
+@RestController
+public class ListOfItemsController {
+
+    @RequestMapping("/resource/list")
+    List simpleminded() {
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        Map<String, String> map1 = new HashMap<String, String>();
+        map1.put("id", "1");
+        map1.put("title", "Go for a swim");
+        map1.put("content", "Go swimming on Monday night");
+        result.add(0, map1);
+
+        Map<String, String> map2 = new HashMap<String, String>();
+        map2.put("id", "2");
+        map2.put("title", "Visit farmer's market");
+        map2.put("content", "Buy dairy and eggs at farmers market on Wednesday");
+        result.add(1, map2);
+
+        return result;
+    }
+}
+#+END_SRC
+
+
+Before you run the webserver, run the ListOfItemsControllerTest unit test and
+check that the test passes.  Then try the webserver and all should be broken,
+because there is not index.html page that matches the hello-angular.html we
+wrote above.  Similarly, we should write a very simple angular controller which
+will contact the new endpoint for us, like hello.js did above.
+
+The essential part of index.html is listed below.  We see the same essentials:
+- a controller 'home' is declared on the app 'index'
+- for Bootstrap we have a class =container=, with a delimited list inside it
+  (Bootstrap annotation =list-group=) and individual =dd/dt= items in it
+  (Bootstrap annotation =list-group-item=.  
+- The items are written out by a =ng-repeat= loop, which assigns =item= to each
+  todo list item.
+- For each item, we show the title, its id (a temporary measure) and the
+  content. 
+
+#+BEGIN_SRC html
+<body ng-app="index">
+    <div class="container">
+        <h1>My TODO list</h1>
+        <div ng-controller="home" ng-cloak class="ng-cloak">
+            <dl class="list-group">
+                <div ng-repeat="item in listofitems">
+                    <div class="list-group-item">
+                        <dt>{{item.title}} ({{item.id}})</dt>
+                        <dd>{{item.content}}</dd>
+                    </div>
+                </div>
+            </dl>
+        </div>
+#+END_SRC
+
+We have to implement a minimal controller, which simply fetches the data from
+the endpoint.  It is only a few lines of code for 'index.js':
+
+#+BEGIN_SRC javascript
+angular.module('index', []).
+    controller('home', function($scope, $http) {
+        $http.get('resource/list/').then(function(success) {
+            $scope.listofitems = success.data;
+        })
+    });
+#+END_SRC
+
+
+Here is what the result will should look like. With that we have completed this
+installment of the tutorial, as we can close the user story.
+
+
+[[./screenshots/main screen at springdo-2.png]]
+
+
+#+BEGIN_commit
+ [[github:1d527951050058876bb98ea579ea768954bcab89]]
+#+END_commit
 
 * emacs settings  :archive:noexport:
 
