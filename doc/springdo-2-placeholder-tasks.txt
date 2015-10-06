@@ -17,10 +17,13 @@
 
 # video links, replace this for production:
 # insert with <y TAB
-#+LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+#  +LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# http://orgmode.org/manual/Link-abbreviations.html#Link-abbreviations
 
 # github links, insert with <g TAB
-#+LINK: github https://github.com/dirkjot/springdo/commit/%s
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+#+LINK: google    http://www.google.com/search?q=%s
 
 
 # screen recording with quicktime player, screen set to 1600x900 (display), b/w
@@ -42,6 +45,7 @@ commit later after we have implemented the tests).
 #+BEGIN_commit
  [[github:a6a570c48bee85ee367064265298a477d18c58e0]]
 #+END_commit
+
 
 
 * A new user story
@@ -223,7 +227,7 @@ will start out displaying the variable's content *and* the variable's content
 will immediately reflect any changes the user is making to the input field.
 
 #+BEGIN_video
-*Video* AngularJS is constantly updating the page [[https://youtu.be/YPvvXKfeOFY][Springdo-2-v1]
+*Video* AngularJS is constantly updating the page [[https://youtu.be/YPvvXKfeOFY][Springdo-2-v1]]
 #+END_video
 
 This doesn't actually solve the user story, as we have created a demo page for
@@ -353,7 +357,7 @@ include a new dependency.  Make sure the Maven repository has been read by
 IntelliJ so you can simply search for 'jsonPath' and insert it. 
 
 #+BEGIN_video
-*Video* Adding the jsonPath dependency in the pom.xml, using IntelliJ [[https://youtu.be/YPvvXKfeOFY][Springdo-2-v1]
+*Video* Adding the jsonPath dependency in the pom.xml, using IntelliJ [[https://youtu.be/YPvvXKfeOFY][Springdo-2-v1]]
 #+END_video
 
 #+BEGIN_commit
@@ -453,12 +457,17 @@ Here is what the result will should look like. With that we have completed this
 installment of the tutorial, as we can close the user story.
 
 
-[[./screenshots/main screen at springdo-2.png]]
+[[http://4.bp.blogspot.com/-lS8LJGHT26o/VhP6BjT0I7I/AAAAAAAAQt0/b7NoIY0CbtI/s320/main%2Bscreen%2Bat%2Bspringdo-2.png]]
 
+#  [[./screenshots/main screen at springdo-2.png]]
+
+And you can find the final code on github:
 
 #+BEGIN_commit
  [[github:1d527951050058876bb98ea579ea768954bcab89]]
 #+END_commit
+
+See you next time!
 
 * emacs settings  :archive:noexport:
 
