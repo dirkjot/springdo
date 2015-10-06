@@ -24,6 +24,8 @@ hs_err_pid*
 build/
 target/
 out/
+# intellij personal project settings:
+springdo.ipr
 
 # documentation output
 doc/*.html
