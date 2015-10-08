@@ -1,0 +1,483 @@
+                                          
+
+* settings 							   :archive:noexport:
+
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t num:nil toc:t
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+INFOJS_OPT:
+#+LATEX_HEADER:
+
+# video links, replace this for production:
+# insert with <y TAB
+#  +LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# http://orgmode.org/manual/Link-abbreviations.html#Link-abbreviations
+
+# github links, insert with <g TAB
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+#+LINK: google    http://www.google.com/search?q=%s
+
+
+# screen recording with quicktime player, screen set to 1600x900 (display), b/w
+# (access* Spring Boot
+
+
+* Adding checkboxes
+
+#+BEGIN_QUOTE
+"I'm Doing 120 plowing over check boxes" (Beastie Boys, High Plains Drifter)
+#+END_QUOTE
+
+
+We left off with the project in a good state:  Two todo items are served by the
+Spring backend (ListItemController.java) and the angular code in index.html will
+retrieve them and then loop over them.  Our user story that things "looked nice"
+has been finished as was the second user story, requiring "two items to be
+displayed".   So it is time to pick up another story:
+
+#+BEGIN_userstory
+*User Story* A user can mark the (placeholder) task as completed
+#+END_userstory
+
+Now our todo items so far have been a little unusual in that they have a title
+and content.  This was a design decision we never discussed but let's assume it
+came out of some user requirement: After all, there is often some content that
+is connected to a todo item, like an address, a link, or just some more
+information (in actual fact, it comes out of a requirement to have more backend
+functionality later on).    What our items lacked was a todo/done toggle, which
+our users really need.
+
+In case you lost it, this is our code at the end of the last tutorial.
+#+BEGIN_commit
+ [[github:1d527951050058876bb98ea579ea768954bcab89]]
+#+END_commit
+ 
+
+We start by adding the checkboxes in the back end.  The changes are minimal, as
+can be seen from this diff: We just add one line.  
+#+BEGIN_SRC java
+    @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
+    List listOfItems() {
+         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+         Map<String, String> map1 = new HashMap<String, String>();
+         map1.put("id", "1");
+         map1.put("title", "Go for a swim");
+         map1.put("content", "Go swimming on Monday night");
++        map1.put("done","yes");
+#+END_SRC
+
+
+*Lesson Learned* You may think (and we thought) that using a boolean value for
+the 'done' flag is more natural. However, we have declared our the 'return'
+variable in our function to be of the type =List<Map<String, String>>=, which
+means that =map1.put("done", true)= will give you a type error at compile time.
+Now the clever thing to do would be to define 'result' as
+=List<Map<String, Object>>= (which means we can have strings and booleans).  The
+very java thing to do would be to create a 'StringOrBool' abstract class, which
+is extended by two helper classes that are empty but for one data field, and
+then declare =List<Map<String, StringOrBool>> result=.
+
+Because we were just trying something out, we made the quick decision to use
+string values 'yes' and 'no'.  Then we built tests, more functions, and before
+we knew, it would be fair amount of refactoring to get rid of these strings and
+go back to booleans.  We will do this later but leave these strings here for
+now.  
+
+Another good point is that there is no need for a map here.  An object 'item'
+would be much better, with attributes like 'item.title'. In fact, that is what
+we will do later in this episode, when we interface with a database. 
+
+
+* On the frontend side
+
+To show these checkboxes, we need to add a small form to our 'index.html'.  This
+is done inside the =ng-repeat= so each item will be formatted with this:
+
+#+BEGIN_SRC html
+    <dt>{{item.title}} ({{item.id}})</dt>
+    <dd>{{item.content}}</dd>
+    <form name="form{{item.id}}">
+        <label>Done
+            <input type="checkbox" ng-model="item.done"
+                   ng-true-value="'yes'" ng-false-value="'no'"
+                   ng-click='onDoneClick(item)'>
+        </label></form>
+#+END_SRC
+
+Because we have multiple items, we will have multiple forms and we distinguish
+these by adding the item number to each.  So for item 1, the form will be
+'form1'. The =<input>= tag introduces several new Angular features:
+- An =ng-model= links the field to a javascript variable, it is the two-way
+  binding counterpart to ={{item.id}}=.  If the user clicks the checkbox,
+  =item.done= will be updated immediately.
+- Our unfortunate decision to use 'yes' and 'no' instead of a boolean is fully
+  supported by AngularJS through the =ng-true-value= and matching false-value
+  option.  Our checkbox will natively toggle between 'yes' and 'no'.
+- We also want to notify the backend of the change in status, so we connect our
+  custom function 'onDoneClick' to the checkbox.
+
+The 'onDoneClick' function contacts a new endpoint on the server
+(=/resource/done/{itemnumber}/{state}/=) and that is basically it.  This means
+that the local update to the javascript AngularJS MVC is now independent from the backend
+update to Spring.  That is good news in so far that the connection to the back
+end could be slow but the user experience is smooth and interactive.  
+
+It is also bad news in that we can have a discrepancy between what Spring thinks
+the user state is and what Angular thinks the user state is, while the user only
+sees the Angular state.  We could only update the checkbox when we get a
+confirmation of the update from Spring and that would assure consistency, but
+that would come at the cost of interactivity.  The most popular middle way seems
+to connect a failure function to the server update fired by onDoneClick, and
+show a popup to the user saying something like "We are having trouble contacting
+the server".  
+
+#+BEGIN_SRC javascript
+angular.module('index', []).
+    controller('home', function($scope, $http) {
+           // stuff deleted
+        $scope.onDoneClick = function (item) {
+            console.log(item.done);
+            $http.post('/resource/done/' + item.id + '/' + item.done + '/');
+#+END_SRC
+
+If you try this, everything will work but in the console log of the spring
+server and in the console of the browser, you will see that the post to
+=/resource/done/..= is not successful as there is no endpoint.  The Spring boot
+log will also alert you to a not implemented POST method.  
+
+The checkout is below, if you want you
+can imlement a simple =alert= message when the server cannot be reached (as is
+the case right now), or even show a more fancy floating HTML element on the page
+itself.  Please link to your solutions in the comments!
+
+
+#+BEGIN_commit 
+[[github:0d490186b5da9699378d631532715df046d92715]]
+#+END_commit
+
+* Adding state changes to the backend -- using a real database
+
+We have an interesting problem right now: We would like to store the state
+change (from 'done is no' to 'done is yes', or the other way around) in the
+backend but we do not really have a model of the todo item in the backend.  We
+have made do with the /minimal thing that works/, which was a list of maps, with
+one map for each todo item.  We can of course continue on this hacky path but it
+seems time to introduce a real database to our project.
+
+
+There are many databases out there and each of them have their own niche.  Do we
+want to tie down our project to one particular database right now? Probably not.
+Also, there are great advantages to using an in-memory database for development,
+but a real on-disk database for production.  JDBC is a java standard for using
+databases through a standardized API, but it is cumbersome and low-level, like
+many things java.  A new standard JPA has emerged which is object oriented, much
+higher level, and supported by Spring (see
+[[http://stackoverflow.com/questions/11881548/jpa-or-jdbc-how-are-they-different][this
+StackOverflow question]] for a good comparison).
+
+If you have ever seen any Object-Relational Mapping (ORM) code, you will feel at
+home when using [[http://projects.spring.io/spring-data-jpa/][Spring Data
+JPA]].  I show only the essential parts of the source here, look at the
+repository for the full details.
+
+#+BEGIN_SRC java
+@Entity
+public class Item {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    public long id;
+    public String title;
+    public String content;
+    public String done;
+#+END_SRC
+
+
+In JPA notation, an =@Entity= is a class that will be stored in the database
+(usually this class will get its own table).  Our entity 'Item' has the two
+values we already saw before, title and content.  It also has a string for its
+done value.  The string should only ever be 'yes' or 'no', but we do not
+currently enforce that.  Finally, everything database needs a unique id, so we
+add a column for that and tell JPA to get some type of unique value in here (we will
+get an incrementing counter, it turns out).
+
+What Spring Boot adds to this is fine JPA syntax  is the auto configuration of the first
+database on path at runtime. In the project setup back in episode 1, we
+instructed you to do the following: "Under dependencies, check 'Web', 'JPA',
+'HSQLDB'".  We chose the HSQLDB database for a very simple reason: It is implemented
+in pure Java so we can simply pull it in with maven and build it with the rest
+of the project.  It is a fine database otherwise, as you can read
+[[http://hsqldb.org/][on its homepage]].  Lacking any further instructions as to
+user and password for the database, Spring Boot will set up a temporary
+in-memory database and give you a handle to it.  The data will persist until you
+stop the Spring boot process, which is perfect for our needs.
+
+Back to the Item we have defined above, which is a class that describes a single
+row in the database table (if you come from an SQL background) or a document in a
+collection (if you come from NOSQL like MongoDB).  Item allows us to define
+properties at this level, but we also need to say things about the table
+(collection) itself.  We do this in a helper class which is customarily called
+'ItemRepository'.  It is short and sweet:
+
+#+BEGIN_SRC 
+public interface ItemRepository extends CrudRepository<Item, Long> {
+   }
+#+END_SRC
+
+A CRUD (Create - Read - Update - Delete) repository allows us to do simple
+things with the basic entities, as described in the acronym.  For a todo list,
+this is a great fit.  We get a number of standard methods on our repository,
+including:
+- /Entity/ *save* (/Entity/)
+- /Entity/ *findOne* (/PrimaryKey/)
+- /Iterable of Entity/ *findAll* ()
+- void *delete* (/PrimaryKey/)
+
+If you want to read more: Try the documentation, the =CrudRepository= is best
+discussed under the [[http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.core-concepts][General Concepts]] of JDA.  Oliver Gierke shared this great
+overview of the two major types of Spring JPA classes on [[http://stackoverflow.com/questions/14014086/what-is-difference-between-crudrepository-and-jparepository-interfaces-in-spring/20784007#20784007][StackOverflow]].
+
+How do we use this great repository in our project?  This involves a fair amount
+of small changes in various places.  For starters, we want to populate the
+database on startup.  The easiest way to do something like this is to add a
+'run' method to our main class SpringdoApplication, see the code:
+
+*Lesson Learned*: Do not forget to change the main class to =implements
+CommandLineRunner=, or =run= will not work and you will get java compiler errors
+on the =@Override=. 
+
+#+BEGIN_SRC java
+    @Override
+    public void run(String... strings) throws Exception {
+        itemRepository.save(new Item("swim", "in the pool"));
+        itemRepository.save(new Item("run", "around the park"));
+        itemRepository.save(new Item("shop", "for new shoes"));
+        itemRepository.save(new Item("drive", "to great viewpoint"));
+        itemRepository.save(new Item("sleep", "at least 8 hours"));
+#+END_SRC
+
+We are using the JPA =save= method on a newly created Item object.  This is all
+very straightforward and a whole lot easier than trying to come up with the
+correct SQL syntax for this, making sure the column names match our property
+names, etc.  But wait, how does =run= know what the itemrepository is and where
+it lives?  Hold on to that question just for a minute.
+
+With this saved, we can change our =/resource/list/= end point to not
+hand-create a map, but query the database using the =findAll= function.  Let's
+start with line 10 in the code below, where we do just that:  
+- The =findAll= method returns an 'iterable' over type 'Item'.  We want to
+  extract the items from this iterable.
+- We create an empty =ArrayList= to hold the items later
+- We apply '.iterator()' to obtain an actual iterator (something you can iterate
+  over) from the iterable.  This is relatively confusing, but basically the
+  'iterable' is a factory function that creates fresh iterators every time you
+  use its =.iterator= method.  Each of these iterators is independent, ie. you
+  could run two for loops over two of these iterators simultaneously and they
+  would not interfere with each other.
+- In line 14, we use Java 8 to avoid a for-loop on the iterator altogether.
+  Using a construction that is borrowed from more functional languages like Ruby
+  and Python, we tell the iterator to apply a function to each of its elements
+  with =forEachRemaining=.  The function we want to apply is =result::add=,
+  which is the =add= method of the =result= List we have just created (see
+  [[http://stackoverflow.com/questions/20001427/double-colon-operator-in-java-8][thisSO answer]]
+  if you are a little uncertain about your Java 8 syntax here).
+
+#+BEGIN_SRC java -n
+public class ListOfItemsController {
+
+    ItemRepository itemRepository;
+
+    @Autowired
+    ListOfItemsController(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
+
+    @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
+    List listOfItems() {
+        Iterable<Item> iterable = itemRepository.findAll();
+        List<Item> result = new ArrayList<>();
+        iterable.iterator().forEachRemaining(result::add);
+        return result;
+    }
+#+END_SRC
+
+Lines 3 to 7 deal with the question we raised before:  How does the class local
+variable =itemRepository= get its value?  Line 6 contains a constructor for
+ListOfItemsController which is called with one argument, the itemRepository.
+
+The =@Autowired= annotation right above it tells Spring that we want it to have
+Dependency Injection, which means:  
+- to find an existing object of the Itemrepository class 
+- lacking that, to instantiate an object of the ItemRepository class
+- and call our constructor with that object so we can store the object
+  internally
+
+Because this is a very common requirement and it is kind of boring to have to
+write a constructor for this, we can abbreviate this for classes for which we
+don't need our own constructor.  Specifically, these two lines below will mark
+the object-local variable 'itemRepository' as to-be-autowired and Spring will
+construct the same constructor as we wrote out above.  This comes in really
+handy when you have multiple values to inject.   
+:     @Autowired
+:     ItemRepository itemRepository;
+
+
+We already had a function 'listOfItems', which served from a hand constructed
+map. We moved this out of the way by renaming it listOfDummyItems and having it
+connect to =/resource/dummylist/=.  I like to keep these old controllers around
+for a bit so I can keep my old tests running while I develop the new
+functionality.  We will see it come in handy in a minute. 
+
+Next we need to implement the backend for toggling the 'done' state of a todo
+item.  In the AngularJS part (in index.js), we made a call like this: 
+: $http.post('/resource/done/' + item.id + '/' + item.done + '/');
+To implement this, we need a function =postDoneUpdate=:
+- It connects to an endpoint that interprets variables in the url (item.id and item.done).
+  Spring supplies the =/{id}/= syntax for this, together with a =@PathVariable=
+  annotation on the function argument, as explained in the [[http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping-uri-templates][Spring MVC documentation]]. 
+- With that id in hand, we will use the database to find the actual item.
+- Assign the new value of 'done' to the retrieved item
+- Save the item back to the database
+
+#+BEGIN_commit
+ [[github:ff8dc58fcad3f9432e38bf620c2fdc20ceb60a45]]
+#+END_commit
+
+The code is in the repository, at the next commit, but I encourage you to try to
+write it yourself.  To help you, here is a test that you can run to see whether
+your code works  (this code is already in the commit above):
+
+#+BEGIN_SRC java
+    @Test
+    public void whenItemIsCheckedAsDoneModelIsUpdated() throws Exception {
+        Item item = new Item("Fake Todo", "Do Lots of stuff");
+        // post item into db
+        itemRepository.save(item);
+
+        // call the backend function and set the 'done' to 'yes' for this item
+        mvc.perform(post(String.format("/resource/done/%d/yes/", item.id)))
+                .andDo(print())
+                .andExpect(status().isOk());
+        // retrieve updated item from db
+        Item newItem = itemRepository.findOne(item.id);
+        // check that for updated item, done == yes, while
+        assertEquals(item.done, "no");
+        assertEquals(newItem.done, "yes");
+    }
+#+END_SRC
+
+*Lesson Learned* The ubiqutous use of the word 'item' is getting on my nerves.
+Why did we call it item and not just 'Thing'?   Or 'Widget', 'Foo' or [[https://goo.gl/2hkllH]['Thingamajigger']]?  More
+seriously, these are
+all bad names because they are too generic.  Part of the problem is that
+IntelliJ will syntax highlight the word TODO wherever it can.  If you commit
+from within IntelliJ, it will even ask you to review your TODO items before
+finalizing  the commit (you can switch this off).  That is normally
+great but not so much if you are writing an application about 'To Do Notes'.
+
+Even though IntelliJ has a great renaming utility (highlight the word, right
+click, refactor, rename), this is a decently challenging rename given how 'item'
+also shows up in our comments and in longer test names like the one above.  It
+is good to explore whether automatic refactoring works in this case, or whether
+simply search and replace will serve you better.  You will undoubtedly give a
+class a wrong name at one point, or the class will morph so the original (good)
+name does no longer apply.  Learning now how to get out of this situation will
+avoid endless confusion later on.  Refactor away!
+
+
+* Problems with AngularJS
+
+This test should be fairly self-explanatory:  We create a new todo item and
+instert it into the database with an =itemRepository.save= call.  Then we update
+the done state of the newly created item via a call to our endpoint, inserting
+the correct =item.id= in the POST.  Next, we retrieve a new copy of the item
+from the database and assert that the new item has done set, and the original
+item did not have it set. 
+
+For my implementation of postDoneUpdate, this test works.  I then ran Spring and
+tested the whole application by hand and indeed, checkboxes were present and
+could be toggled.  A reload of the browser made the checkboxes come back to the
+state they were last in, indicating that we are indeed using the backend
+database.  (Note that the database is in-memory, so it does not preserve state
+between runs of the application).
+
+So all seems well but there is a problem:  If you open the console of the
+browser, it turns out AngularJS is having some serious trouble and is throwing a
+'syntax error'.  This message shows up when we check or uncheck a box, and it is
+repeated for every check-action.  The stack trace shows lots of routines inside
+the angular javascript stack, and never seems to touch our code.  What is going
+wrong here?
+
+[[http://1.bp.blogspot.com/-YrH5wbuZdqM/VhbbyiROAdI/AAAAAAAAQvw/TpMdIMy1qOE/s320/angular-syntax-error.png]]
+
+The problem, it turns out, is that my version of postDoneUpdate is returning an
+ok message.  I did this so I could post a change myself (using the excellent
+[[https://chrome.google.com/webstore/search/postman][Postman]] tool) and see that we got a happy return value from this:
+:         return "['ok']";
+This sounds all nice and dandy, but there is a problem here that is easy to
+miss:  All methods of ListOfItemsController are return JSON by virtue of this
+being a =@RestController=.  Specifically, AngularJS expects all responses to be
+valid JSON.  And ="['ok']"= may look like valid JSON, but a quick check via [[jsonlint.com]]
+will tell you it is not.  We start with =[=, which is correct because JSON requires every return object to be a list or a
+map.  But JSON also requires double quotes around strings (for reasons that are nicely
+discussed in this [[http://stackoverflow.com/questions/4201441/is-there-any-practical-reason-to-use-quoted-strings-for-json-keys/4201631#4201631][StackOverflow reply]]) and even though some JSON parsers have
+gotten flexible about this, AngularJS enforces that.  
+
+The solution therefore is the a bunch less pretty but very straightforward:
+:         return "[\"ok\"]";
+
+
+With the finer details of JSON syntax out of the way, the question arises how
+this error was present yet we did not detect it until we opened the browser's
+console.  The first reason is that AngularJS =$http.post= (in index.js) does not
+have a =.then= clause.  In other words, AngularJS will parse the return value of
+the post, crash, but because nothing is supposed to happen after this post,
+there are no consequences for our program logic. 
+
+We can make this more visible by adding the success and failure functions via a =.then=:
+:  $http.post('/resource/done/' + item.id + '/' + item.done + '/')
+:     .then(function (success) { console.log("backend received done state change", success) },
+:           function (failure) { console.log("backend error", failure) });
+
+The second reason is that AngularJS is trying to be nice and show 'graceful
+degregation':  Something is not working right but there is no reason to crash
+the browser or throw an 'Aw snap' message at the user.  Instead we just move on,
+hoping that things will otherwise work fine.  This is great behavior for sloppy
+webdesigners, but unhappy for people who want to ensure and test that each part
+of their application is working correctly.
+
+The third and most important reason we missed this is therefore that we did not
+write any tests for AngularJS, nor did we write any end-to-end tests, acceptance
+tests, or whatever you may want to call these.  On visual inspection, AngularJS
+was working fine but a good test should have caught the syntax error in the
+console.  Because testing AngularJS is not trivial and slightly outside of the
+scope of this tutorial, we will leave this issue here, but keep in mind that for
+now, we are only testing whether the Spring framework is working well.
+
+The user story ("A user can mark the (placeholder) task as completed") is
+finished, time to end this episode.
+
+#+BEGIN_commit
+ [[github:41dc403a2f3b5783a8f0c77ee736bf6bee0800c0]]
+#+END_commit
+
+See you next time!
+
+
+* emacs settings  :archive:noexport:
+
+Local Variables:
+mode: org
+fill-column: 80
+eval: (auto-fill-mode t)
+eval: (flyspell-mode t)
+End:
+

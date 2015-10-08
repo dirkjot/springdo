@@ -55,7 +55,6 @@ this one apart?
   more in depth content throughout.
 
 
-
 * Conventions
 
 "Too long; didn't read" is often abbreviated *TLDR* here and has an [[https://en.wikipedia.org/wiki/Wikipedia:Too_long;_didn%27t_read][interesting
