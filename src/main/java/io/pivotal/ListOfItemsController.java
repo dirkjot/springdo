@@ -51,7 +51,15 @@ public class ListOfItemsController {
         return result;
     }
 
-
-
-
+    @RequestMapping(value="/resource/done/{id}/{state}/", method= RequestMethod.POST)
+    String postDoneUpdate(@PathVariable long id, @PathVariable String state) {
+        Item item = itemRepository.findOne(id);
+        if (state.equals("yes") || state.equals("no")) {
+            item.done = state;
+        } else {
+          System.out.println("Invalid argument to postDoneUpdate:  " + state);
+        }
+        itemRepository.save(item);
+        return "[\"ok\"]";
+    }
 }
