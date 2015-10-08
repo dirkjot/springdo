@@ -1,12 +1,12 @@
 package io.pivotal;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by pivotal on 9/21/15.
@@ -15,8 +15,24 @@ import java.util.Map;
 @RestController
 public class ListOfItemsController {
 
-    @RequestMapping("/resource/list")
-    List simpleminded() {
+    @Autowired
+    ItemRepository itemRepository;
+
+    //@Autowired
+    //ListOfItemsController(ItemRepository itemRepository) {
+    //    this.itemRepository = itemRepository;
+    //}
+
+    @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
+    List listOfItems() {
+        Iterable<Item> iterable = itemRepository.findAll();
+        List<Item> result = new ArrayList<>();
+        iterable.iterator().forEachRemaining(result::add);
+        return result;
+    }
+
+    @RequestMapping(value="/resource/dummylist/", method= RequestMethod.GET)
+    List listOfDummyItems() {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         Map<String, String> map1 = new HashMap<String, String>();
         map1.put("id", "1");
@@ -34,4 +50,8 @@ public class ListOfItemsController {
 
         return result;
     }
+
+
+
+
 }

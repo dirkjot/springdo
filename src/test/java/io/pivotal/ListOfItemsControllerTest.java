@@ -2,6 +2,7 @@ package io.pivotal;
 
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -26,9 +28,21 @@ public class ListOfItemsControllerTest {
 
     private MockMvc mvc;
 
+
+
+    @Autowired
+    ItemRepository itemRepository;
+
     @Autowired
     private WebApplicationContext context;
 
+
+    // Instead of the two annotations above, you could also write
+    //    @Autowired
+    //    ListOfItemsControllerTest(ItemRepository itemRepository, WebApplicationContext context) {
+    //        this.itemRepository = itemRepository;
+    //        this.context = context;
+    //    }
 
     @Before
     public void setUp() throws Exception {
@@ -45,7 +59,7 @@ public class ListOfItemsControllerTest {
         // id1 / title: Go for a swim  / Content:  Go swimming on Monday night
         // id2 / title: Visit farmer's market / Content: Buy dairy and eggs at farmers market on Wednesday
 
-        mvc.perform(get("/resource/list"))
+        mvc.perform(get("/resource/dummylist/"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -55,6 +69,23 @@ public class ListOfItemsControllerTest {
                 .andExpect(jsonPath("$[1].title", containsString("market")))
                 .andExpect(jsonPath("$[0].content", containsString("swimming on Monday")))
                 .andExpect(jsonPath("$[1].content", containsString("dairy and eggs")));
+    }
+
+    @Test
+    public void whenItemIsCheckedAsDoneModelIsUpdated() throws Exception {
+        Item item = new Item("Fake Todo", "Do Lots of stuff");
+        // post item into db
+        itemRepository.save(item);
+
+        // call the backend function and set the 'done' to 'yes' for this item
+        mvc.perform(post(String.format("/resource/done/%d/yes/", item.id)))
+                .andDo(print())
+                .andExpect(status().isOk());
+        // retrieve updated item from db
+        Item newItem = itemRepository.findOne(item.id);
+        // check that for updated item, done == yes, while
+        assertEquals(item.done, "no");
+        assertEquals(newItem.done, "yes");
     }
 
 }

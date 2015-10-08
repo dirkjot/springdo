@@ -30,3 +30,8 @@ springdo.ipr
 # documentation output
 doc/*.html
 
+
+# merge and patch files
+*.orig
+*.rej
+*.patch
