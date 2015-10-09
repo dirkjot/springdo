@@ -15,20 +15,24 @@
     <h1>My TODO list</h1>
 
     <div ng-controller="home" ng-cloak class="ng-cloak">
-        <dl class="list-group">
+        <div class="list-group">
             <div ng-repeat="item in listofitems">
-                <div class="list-group-item">
-                    <dt>{{item.title}} ({{item.id}})</dt>
-                    <dd>{{item.content}}</dd>
+                <div class="list-group-item row">
+                    <div ng-click="toggleContent(item.id)" class="col-md-6">
+                        {{item.title}} ({{item.id}})
+                        <p ng-show="content[item.id]">
+                            {{item.content}}</p>
+                    </div>
                     <form name="form{{item.id}}">
-                        <label>Done
+                        <div class="col-md-6">Done
                             <input type="checkbox" ng-model="item.done"
                                    ng-true-value="'yes'" ng-false-value="'no'"
                                    ng-click='onDoneClick(item)'>
-                        </label></form>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </dl>
+        </div>
     </div>
 
 </div>
