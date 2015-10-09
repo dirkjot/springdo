@@ -11,6 +11,11 @@ angular.module('index', []).controller('home', function($scope, $http) {
 
 	$scope.content = [];
 	$scope.toggleContent = function(itemid) {
+		for (var key in $scope.content) {
+			if (key != itemid && $scope.content[key]) {
+				$scope.content[key] = false;
+			}
+		}
 		$scope.content[itemid] = !$scope.content[itemid];
 	};
 });
