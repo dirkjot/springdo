@@ -1,0 +1,454 @@
+                                          
+
+* settings 							   :archive:noexport:
+
+# Cx Ce this:
+(local-set-key [f12] (quote org-html-export-to-html))
+
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t num:nil toc:t
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+INFOJS_OPT:
+#+LATEX_HEADER:
+
+
+
+# video links, replace this for production:
+# insert with <y TAB
+#  +LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# http://orgmode.org/manual/Link-abbreviations.html#Link-abbreviations
+
+# github links, insert with <g TAB
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+#+LINK: google    http://www.google.com/search?q=%s
+
+
+# screen recording with quicktime player, screen set to 1600x900 (display), b/w
+# (access* Spring Boot
+
+# be3a4c02c0c0eca27f5dfe37c573e181d3188bbf
+# what we learned about angular:
+# - in angular, things can be hidden/shown and toggled with ng-show and
+#   ng-hide directives, these can go on anything (like a <dt> in our
+#   case) :  <dt ng-show="toggle[item.id]"
+# - the ng-show has an argument which is the model variable on which it
+#   will show, var == true -> tag shows
+# - the argument is normally a variable, but can also be an array.  we
+#   have multiple todo items and only one toggle function, so we use an
+#   array with the item.id
+# - inside the ng.show, you do not need the {{item.id}} or $scope.
+# - we do need to set up the toggle array in our model (index.js):
+#   $scope.toggle = [];
+# - all array items are undefined at first, but that is fine if we want
+#   our item hidden: ng-show(undefined) will make things hidden.
+# - to toggle, we need a test that sets undefined and false to true, and
+#   true to false: $scope.toggle[myvar] = $scope.toggle[myvar] === true
+#   ? false : true;};
+# - the state change is started by a click on the title, you can connect
+#   an ng-click to ANY item (does not have to be button).
+#   <dt ng-click="toggleCustom(item.id)">Our ToDo title here</dt>
+# 
+# 
+# - stored the front end business in https://jsfiddle.net/t1q5x5g8/
+# 
+
+#+TITLE: Dynamic content and editing entries
+
+* Hiding and showing content
+
+You may have noticed that we are only showing the notes titles, IDs and the done
+status so far (and those IDs are only there for us, they will be removed in
+future version).  That leaves the content of the notes hidden from the user's
+view.  Recall, the content was background information to the note, so it is a
+great design decision to leave it hidden at first.  However, our user wants to
+be able to view it at times:
+
+#+BEGIN_userstory
+*User Story* The user can click on a title to make the content visible. 
+#+END_userstory
+
+The story is not complete, we imagine that
+1. all items come up as closed first (content hidden)
+2. opening one item closes any other open items
+3. clicking on the title of an already open item closes it again.
+
+We will dive a little deeper into AngularJS to see how we can accomplish this
+task.  As showing and hiding parts of a page is very standard functionality,
+AngularJS built a great system to hide/show almost any part of a webpage.
+
+#+BEGIN_SRC html -n
+    <div ng-controller="home" ng-cloak class="ng-cloak">
+        <div class="list-group">
+            <div ng-repeat="item in listofitems">
+                <div class="list-group-item row">
+                    <div ng-click="toggleContent(item.id)" class="col-md-6">{{item.title}} ({{item.id}})
+                        <p ng-show="content[item.id]">{{item.content}}</p>
+                    </div>
+                    <form name="form{{item.id}}">
+                        <div class="col-md-6">Done
+                            <input type="checkbox" ng-model="item.done"
+                                   ng-true-value="'yes'" ng-false-value="'no'"
+                                   ng-click='onDoneClick(item)'>
+#+END_SRC
+
+This is the same controller we saw before, but in line 6 we see a new =<p>=
+which wraps ={{item.content}}=.  Crucially, this paragraph is shown or hidden
+under control of some javascript variable thanks to =ng-show=.  If the value of
+=ng-show= is true, the tag that ng-show is part of is shown, otherwise it is
+hidden ([[https://docs.angularjs.org/api/ng/directive/ngShow][documentation]]).
+If a transition between shown and hidden occurs, the transition is animated.
+Like all AngularJS, the webpage will (almost) immediately reflect any changes
+you make to the variable.
+
+The easiest way to use =ng-show= would be with a simple variable, like so
+: <div ng-show="showit">Hide or show me </div>
+Note that =showit= is a variable at the javascript level, but it should be
+quoted in the =ng-show= statement because HTML will not know about it.  In the
+matching AngularJS we will refer to the same variable as =$scope.showit=.
+Because we have more than one item to show and hide, we use an array =content=
+instead (again, we did not choose the best possible name here, =contentVisible[item.id]=
+would have been much better). 
+
+Why does the array variable have to be quoted?  What AngularJS does under the
+hood is to have javascript evaluate =content[item.id]= in the context stored in
+=$scope=.  Different controllers have different scopes, which gives you
+a way to separate namespaces without having to name those spaces:  Another
+controller could also have a =content= variable, but that would be in another
+scope.  This concept of scope is very similar to dynamic languages like Python.
+
+Two asides: First, in the code above we have added
+[[https://getbootstrap.com/examples/grid/][Bootstrap formatting classes]] like
+=col-md-6= in places.  Second, if you want to use a constant in an angular
+directive you have to double quote it, once for HTML and once for the javascript
+evaluate, like so:
+: <div ng-show="'constant'"> Text will be shown </div>
+
+Hiding the content of the item is great, now we need a means to show it.  Line 5
+has a =div= with the an =ng-click= attribute, and a function to call when this
+=div= is clicked on, the function will have to be defined in the =home=
+controller as =$scope.toggleContent=.  Note that any item can have a =ng-click=
+attribute (thanks to the HTML =onClick= event, which can basically be attached
+to [[http://www.w3schools.com/jsref/event_onclick.asp][any html element]]), we
+do not have to create a button.
+
+Here is part of that function:
+#+BEGIN_SRC javascript
+	$scope.content = [];
+	$scope.toggleContent = function(itemid) {
+		$scope.content[itemid] = !$scope.content[itemid]; };
+#+END_SRC
+
+In javascript, 'undefined' is
+[[https://developer.mozilla.org/en-US/docs/Glossary/Falsy][falsy]] which means
+that all content will be hidden by default.  The boolean negator =!= will turn
+anything falsy into =true= and the relevant item content will be shown.   The
+initialization of the content array in line 1 is crucial, without that the code
+will not run (Whereas accessing a non-existing item on an existing array returns
+=undefined=, accessing a non-existing item on a non-existing array will throw a
+'Uncaught reference error'; gone are the good old days of [[https://en.wikipedia.org/wiki/AWK][Awk]] where this was
+totally fine). 
+
+#+BEGIN_commit
+ [[github:21bc0893b1e512ed5df653e41e9916fd77067558]]
+#+END_commit
+
+* Closing the other items
+
+*TLDR* Front end testing really helps to check that we do not introduce
+regressions when adding new functionality.
+
+This solves the user story and our considerations 1 and 3 above.  We have not
+dealt with consideration 2: "Opening one item closes any other open items".  If
+you look at the interface like this, it seems nice enough.  But apparently on
+further probing, our [[https://en.wikipedia.org/wiki/Product_manager][product
+manager]] wanted the app to look more like a mobile app, where this 'one thing
+open at a time' behavior is very common.  From a UI perspective, it makes the
+display less busy and cluttered, but it means users cannot compare the full
+contents of two todo items easily.  On the web, this kind of UI also exists:
+jQuery calls this the [[https://jqueryui.com/accordion/][Accordion Widget]] and
+you can easily create a very similar widget in pure
+[[http://www.tutorialrepublic.com/codelab.php?topic=bootstrap&file=accordion][Bootstrap]].
+
+Implementing it is not hard but the there is a small catch.  Before I go over those
+I suggest you take the previous commit and try to implement this behavior for
+yourself:  We managed it in three lines of javascript and you may be able to do
+it in less.
+
+OK, the catch that we missed at first (and did not find during our testing
+either), is conderation 3:  "Clicking on an already open item should close it
+again".  The code at the commit above has this behavior, but we implemented
+consideration 2 by closing all items before we toggle the current one, like
+this code but without line 2.
+#+BEGIN_SRC javascript -n
+		for (var key in $scope.content) {
+			if (key != itemid) {
+				$scope.content[key] = false; }}
+		$scope.content[itemid] = !$scope.content[itemid];
+#+END_SRC
+Closing all items first and toggling the current one will give us the correct
+behavior when we open an item, but it will make it impossible to close one.  So
+the =if= becomes necessary to guard against this.  We did not notice this for a
+while because we had tested at earlier stage, when it still worked, and we never
+tested it again as we were focussing on closing the other items.  Again, we will
+not be adding test to our AngularJS code to keep this tutorial focussed, but for
+any serious coding exercise, you should.
+
+
+* Debugging front end code
+
+Restarting the spring backend for every small change in the front end code is
+slow and tedious.  IntelliJ has some support for live editing of html and css
+files, but it is hard to set up and (in our setup) prone to breaking.  Because
+you can easily write a mock version of your controllers in AngularJS (simply add
+a couple of hard-coded variable assignments), it is often more practical to use
+JSFiddle, Plunker, or similar tools to test your code (read this nice
+[[https://www.quora.com/Why-do-most-Angular-js-people-prefer-Plunker-over-http-jsfiddle-net][comparison]]).
+Make your changes there and then copy and paste the new parts back into your
+project.  You can view some experimentation we did with this code here:
+https://jsfiddle.net/dirkjot/gjtmpksw/
+
+You can also find and explore some darker corners of AngularJS that way: In the
+code on the fiddle, we added a =div= to make the title bold.  The item id now
+goes to the next line, so a sensible thing would be to change the =div= into a
+=span=.  Try this and click around on the first and then the second title, and
+you will see the first title disappear when the first item's content is
+hidden. After some probing, we found that wrapping a =div= around the the =p=
+that contains the content helps; without part of the =ng-show= seems to leak out
+of the =p= into the surrounding =div=.  (If you have a more precise explanation,
+please leave a comment!)
+
+Either way, this closes the user story so we make a commit of these three lines
+of code.
+#+BEGIN_commit
+ [[github:be3a4c02c0c0eca27f5dfe37c573e181d3188bbf]]
+#+END_commit
+
+
+* Editing todo items (front end)
+
+Our Product Manager is very happy with us as we are making great progress.
+Let's move on to user contributed content, in the form of this story:
+
+#+BEGIN_userstory
+*User Story* The user can edit the title and content of a story 
+#+END_userstory
+
+The story does not specify how this edit is started.  We cannot tie it to a
+click on the title, as that already expands the item.  We thought it was most
+appropriate to add some well-known icons to the expanded todo item, so we keep a very clean
+interface.  Here is an artist impression of what we want to create:
+
+[[http://3.bp.blogspot.com/-mg08AFpui84/VhgS1hvDkYI/AAAAAAAAQwY/AD-affiR5kw/s320/Screen%2BShot%2B2015-10-09%2Bat%2B12.16.31%2BPM.png]]
+
+Obviously, the placement of the icons and the done checkbox is not perfect, but
+we can improve on this later and focus on writing code for now.  
+
+Our first step is to pull in the font-awesome icons so we can use them here.
+We simply put four =glyphicons= files in the correct directory
+(main/resource/static/fonts) and we are good to go.  To use them,
+we add two lines of html to our index.html:
+
+#+BEGIN_SRC html
+            <span class="glyphicon glyphicon-pencil" ng-click="goedit(item.id)"></span>
+            <span class="glyphicon glyphicon-trash"></span>
+#+END_SRC
+
+We already added a javascript function to a click on the edit icon; we leave the
+delete icon for later.  You can see this code in action on this
+[[https://jsfiddle.net/dirkjot/hmvnbdfb/][JSFiddle]] (we removed some
+experimentation we added in the previous fiddle).
+
+#+BEGIN_commit
+ [[github:86b17fa7228b5346bea8a396a01a171bd1c491f7]]
+#+END_commit
+
+* Actual editing
+
+To actually edit the form we have to write a fair amount of html, as each of the
+items will be in one of three interface states, listed below with the
+combination of variables that determines the state:
+- collapsed:  Only title and done checkbox shown.  Shown when =content[item.id]= is falsy.
+- opened: Title, content and done shown, edit and trash icons visible. Shown
+  when =content[item.id]= is truthy and =editorEnabled= is false.
+- editing: Title and content turn into input boxes, submit button, no other
+  elements. Shown when =content[item.id]= is truthy and =editorEnabled= is
+  true.
+
+This image shows an item in 'editing' state.  Because you can only move to
+'editing' via 'opened', all other items are necessarily 'collapsed' at this
+time.
+
+[[http://1.bp.blogspot.com/-u9pyEeB2jWI/Vhgwm_CF0JI/AAAAAAAAQwo/0-Y1bX0j_1I/s320/Screen%2BShot%2B2015-10-09%2Bat%2B2.24.09%2BPM.png]]
+
+
+The html for each item will now have three parts, one for each of the three
+states.  I refer to the full html in index.html, lines 15-40 on this github
+[[https://github.com/dirkjot/springdo/blob/dc042d8ce9e04c62509b103da12b95f7b1c87d24/src/main/resources/static/index.html][commit]],
+here are the highlights:
+
+#+BEGIN_SRC html -n
+  <div class="list-group-item row">
+      <!-- not editing: -->
+      <form name="form{{item.id}}"   
+          ng-show="!content[item.id] || (content[item.id] && !editorEnabled)">
+              <div ng-click="toggleContent(item.id)"><b>{{item.title}}</b></div>
+              <div ng-show="content[item.id] && !editorEnabled">
+                  <p>{{item.content}}</p>
+      [...]
+      <!-- editing: -->
+      <div ng-show="content[item.id] && editorEnabled">
+          <form name="formedit{{item.id}}"  ng-submit="saveedit(item)" role="form">
+              <div class="form-group">
+                  <input type="text" ng-model="item.titleField" class="form-control"><br>
+                  <textarea type="text" ng-model="item.contentField"  class="form-control">
+                     </textarea><br>
+                  <input type="submit" id="submit" value="Submit"  class="form-control btn btn-warning">
+#+END_SRC
+
+What happened:
+- The html page has become quite complex: Each item has two forms, one for the
+  not-editing state (with only a checkbox as a form element) and one for editing
+  the title and content.  Each item has these forms, so there are a lot of forms
+  open at the same time.
+- The two forms have names specific to the item they are working on: One form is
+  =form..= (insert item.id at the dots) and the editing form is =formedit..=.
+  For each item, only one of them is visible at a time; and only one item can be
+  opened (or editing) at the same time.  
+- *Aside* While debugging, we actually disabled this ng-show mechanism to make
+  it clearer what was happening. I encourage you do the same.
+- The =ng-show= on line 4 controls the heading (the title).  The heading should
+  be shown when this item is collapsed, or when it is open but we are not
+  editing.
+- We bolded all the item titles and removed the id numbers. We decided against
+  angular magic to make only the title of the currently open todo item bold.
+  This would look nice but was more work than we were willing to invest. 
+  # TODO try this with ng-style
+- On line 13, we create an =input= field and connect it to the =item.titleField=
+  attribute.  Angular will 'live' update that variable as the user is typing.
+  We could have used =item.title= here instead and there would be no need to
+  copy values back and forth between =item.title= and =item.titleField= (see
+  index.js). However, the drawback of that method is that you cannot undo your
+  edits. Even though we did not have a Cancel button in the original design, we
+  will be adding one soon.  To be able to cancel, we need to either save the old
+  value, or run the input box on another variable. 
+- in line 14, we do the same for the content, using a =textarea=. 
+
+
+As you may recall, the edit button calls =goedit=, and the submit button (line
+16 and 11 above) calls =saveedit=.  We will write these functions now.  The
+first one, =goedit= is not complicated as we have to change state and populate
+the =titleField= and =contentField= variables:
+
+#+BEGIN_SRC javascript
+	// editing content
+	$scope.editorEnabled = false;
+
+	$scope.goedit = function (item) {
+		$scope.editorEnabled = true;
+		item.titleField = item.title;
+		item.contentField = item.content;
+	};
+#+END_SRC
+
+The =saveedit= function has two parts:  Moving the edit from the editing fields
+into the AngularJS model, then moving the changes into the backend.  We will
+only write the first part for now.  The code is not hard, you could probably
+write it (or jot it down on a piece of paper) in a minute or so.  The one
+addition I made below is a promise to myself to what I want the backend update
+to look like: A POST to =/resource/save/=.  
+
+Save edit therefore is more or less the opposite of goedit:
+#+BEGIN_SRC javascript
+	$scope.saveedit = function (item) {
+		item.title = item.titleField;
+		item.content = item.contentField;
+		$scope.editorEnabled = false;
+		// TODO post this stuff
+		// post('/resource/save/id/title/content/done/')
+	};
+#+End_SRC
+
+*Lesson Learned* This is actually not a great choice for posting material.  It
+would be safer and better to put the item content in the body of the POST,
+instead of the URL.  Then again, we are not sending sensitive information around
+and the length of our notes is not being constraint too much by the maximum
+recommended length of a URL,
+[[http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers][2000~characters]]
+(and Chrome can easily go over 150,000 characters)
+
+
+At this point, you can make edits and hit 'submit'.  If you open and close the
+item, you will see that your saved content has been saved locally.  However, a
+page reload will contact the server again and you will get the original items
+back.  We are finished with our story, but we can see the need to persist changes in
+the backend.
+
+#+BEGIN_commit
+ [[github:32a835b39876dfbec45c6b3d35541790fdbd743e]]
+#+END_commit
+
+* Updating the backend
+
+#+BEGIN_userstory
+*User Story* The user's edits are persisted. 
+#+END_userstory
+
+The third story in this episode is going to be very quick:  All we have to do is
+communicate the edits from the frontend to the backend and then persist those
+edits on the backend.  We just have to apply what we already know about
+endpoints and the JPA.
+
+In 'index.js', we make the post that we sketched above more concrete:
+#+BEGIN_SRC javascript 
+  $http.post('/resource/save/' + item.id + '/' + item.title + '/' + item.content + '/' + item.done + '/');
+#+END_SRC
+
+In 'ListOfItems.java', we add the endpoint.  There is not that much code here:
+First some java boilerplate to get the parts of the URL into variables.  Next,
+we retrieve the old item from the database.  We do a check whether the 'done'
+status is indeed only yes or no (but we don't really know what to do if it is
+not, a common problem in programming).  The actual saving of the new item is one
+line of code thanks to the JPA. 
+#+BEGIN_SRC java
+   @RequestMapping(value="/resource/save/{id}/{title}/{content}/{done}/", method=RequestMethod.POST)
+   String postSaveUpdate(@PathVariable long id, 
+                         @PathVariable String title, 
+                         @PathVariable String content, 
+                         @PathVariable String done) {
+       Item item = itemRepository.findOne(id);
+       if (done.equals("yes") || done.equals("no")) {
+           item.done = done; }
+       else {
+           System.out.println("Invalid argument to postSaveUpdate:  " + done); }
+       item.title = title;
+       item.content = content;
+       itemRepository.save(item);
+       return "[\"ok\"]";
+   }
+#+END_SRC
+
+
+Final state at the end of this tutorial:
+#+BEGIN_commit
+ [[github:044069fdf3aa80d672c04bffa7355117c8b2a3c2]]
+#+END_commit
+
+See you next time!
+
+
+* emacs settings  :archive:noexport:
+
+Local Variables:
+mode: org
+fill-column: 80
+eval: (auto-fill-mode t)
+eval: (flyspell-mode t)
+End:

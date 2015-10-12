@@ -102,7 +102,7 @@ index.html (commented out) which allows you to test the main page by
 itself, without a server.
 
 
-** commit 0a69691b627761b56237bc4bb7ac7b9b57d62706: working on show/hide content
+** commit 0a69691b627761b56237bc4bb7ac7b9b57d62706 : working on show/hide content
 
 
 what we learned about angular:
@@ -134,9 +134,9 @@ what we learned about angular:
 https://docs.angularjs.org/api/ng/directive/ngShow
 http://geniuscarrier.com/ng-toggle-in-angularjs/
 
+** commit commit e66aa8779b098345da115f5c23d73b25231ca36d: finishes this
 
-
-** commit e66aa8779b098345da115f5c23d73b25231ca36d: user edits text fields
+** 39b1ea432cdcfa209ef813f2f58deffa95bc4abe user edits text fields
 
 *** design
 
@@ -187,7 +187,7 @@ http://icelab.com.au/articles/click-to-edit-with-angularjs/
 
 ** <intermediate commits>
 
-commit e867ef62da5ec9ea5d8d99d71d70aff49b24b6b9
+commit e867ef62da5ec9eA5d8d99d71d70aff49b24b6b9
 Author: Navya <ncanumalla@pivotal.io>
 Date:   Tue Sep 22 16:08:51 2015 -0700
 
