@@ -88,4 +88,22 @@ public class ListOfItemsControllerTest {
         assertEquals(newItem.done, "yes");
     }
 
+
+    @Test
+    public void whenEditIsMadeTheModelIsUpdated() throws Exception {
+        // setup
+        String newtitle = "New Test Title";
+        Item item = new Item("Test Todo", "Do Lots of stuff");
+        itemRepository.save(item);
+        // make edit 1
+        mvc.perform(post(String.format("/resource/save/%d/%s/%s/no/", item.id, newtitle, item.content)))
+                .andExpect(status().isOk());
+        assertNotEquals(item.title, newtitle);
+        Item newItem = itemRepository.findOne(item.id);
+        assertEquals(newItem.title, newtitle);
+        assertEquals(newItem.content, item.content);
+
+    }
+
+    
 }
