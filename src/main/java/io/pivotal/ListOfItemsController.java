@@ -89,8 +89,5 @@ public class ListOfItemsController {
     }
 
 
-
-
-    // post('/resource/new/title/content/done/')
-
+    //  post('/resource/create/') -> returns id.
 }

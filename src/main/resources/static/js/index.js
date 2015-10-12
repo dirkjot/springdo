@@ -40,6 +40,10 @@ angular.module('index', []).controller('home', function($scope, $http) {
 
 	};
 
+	$scope.plusbutton = function () {
+		$scope.listofitems.push({"id": 6, "title": "new item", "content": "Hi", "done": "no"});
+	};
+
 
 
 });
