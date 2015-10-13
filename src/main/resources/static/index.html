@@ -27,11 +27,14 @@
         <!-- not editing: -->
         <form name="form{{item.id}}" ng-show="!content[item.id] || (content[item.id] && !editorEnabled)">
             <div class="col-md-6">
-                <div ng-click="toggleContent(item.id)"><b>{{item.title}}</b></div>
+                <div ng-click="toggleContent(item.id)">
+                    <b>{{item.title}}</b>
+                    <span ng-if="item.title.length == 0">-No Title-</span>
+                </div>
                 <div ng-show="content[item.id] && !editorEnabled">
                     <p>{{item.content}}</p>
                     <span class="glyphicon glyphicon-pencil" ng-click="goedit(item)"></span>
-                    <span class="glyphicon glyphicon-trash"></span>
+                    <span class="glyphicon glyphicon-trash" ng-click="godelete(item)"></span>
                 </div>
             </div>
             <div class="col-md-6">Done

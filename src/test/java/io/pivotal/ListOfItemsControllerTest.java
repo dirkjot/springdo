@@ -101,7 +101,6 @@ public class ListOfItemsControllerTest {
         Item newItem = itemRepository.findOne(item.id);
         assertEquals(newItem.title, newtitle);
         assertEquals(newItem.content, item.content);
-
     }
 
     @Test
@@ -114,4 +113,18 @@ public class ListOfItemsControllerTest {
                 .andExpect(jsonPath("$.done", is("no")));
 
     }
+
+    @Test
+    public void whenDeleteIsHitItemIsTrashed() throws Exception {
+        // setup
+        String newtitle = "New Test Title";
+        Item item = new Item("Test Todo", "Do Lots of stuff - then delete");
+        itemRepository.save(item);
+        // now remove it
+        mvc.perform(post(String.format("/resource/delete/%d/", item.id)))
+                .andExpect(status().isOk());
+        Item newItem = itemRepository.findOne(item.id);  // returns Null if not found
+        assertNull(newItem);
+    }
+
 }

@@ -102,4 +102,12 @@ public class ListOfItemsController {
         return item;
     }
 
+    /**
+     * A delete method.  In line with traditional REST, we use the post method here.
+     */
+    @RequestMapping(value="/resource/delete/{id}") //, method=RequestMethod.POST)
+    String deleteItem(@PathVariable long id) {
+        itemRepository.delete(id);
+        return "[\"ok\"]";
+    }    
 }
