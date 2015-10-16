@@ -469,6 +469,14 @@ And you can find the final code on github:
 
 See you next time!
 
+* Thanks!
+
+A big thanks to everyone who read and commented on this tutorial, to
+Pivotal Labs for letting me write these tutorials, and  to Navyasri
+Canumalla, who sat down with me to learn Spring and wrote half the
+code you see here. 
+
+
 * emacs settings  :archive:noexport:
 
 Local Variables:

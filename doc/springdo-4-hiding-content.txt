@@ -436,12 +436,40 @@ line of code thanks to the JPA.
 #+END_SRC
 
 
-Final state at the end of this tutorial:
 #+BEGIN_commit
  [[github:044069fdf3aa80d672c04bffa7355117c8b2a3c2]]
 #+END_commit
 
+
+It is nice to see how we can add major user-facing functionality with a few
+lines of code.  In our enthusiasm to implement this, we forgot to do proper Test
+Driven Development:  We should have written a test for the new endpoint before
+implementing it.  Writing a test after the fact is still better than not writing
+a test at all, so off we go.   We should
+- create an new item (for testing purposes)
+- submit it to the database, holding on to its ID
+- POST to the endpoint with a changed title and contents
+- retrieve the new item from the database
+- confirm that title and content have changed.
+
+The code is almost as few lines as that and I recommend you try to write it
+yourself before you peek at the
+[[https://github.com/dirkjot/springdo/blob/0156151bd4cbfccc6a01f28d141ef7f964163efb/src/test/java/io/pivotal/ListOfItemsControllerTest.java][committed]]
+version (near the end of the file).
+
+Final state at the end of this tutorial:
+#+BEGIN_commit
+ [[github:0156151bd4cbfccc6a01f28d141ef7f964163efb]]
+#+END_commit
 See you next time!
+
+
+* Thanks!
+
+A big thanks to everyone who read and commented on this tutorial, to
+Pivotal Labs for letting me write these tutorials, and  to Navyasri
+Canumalla, who sat down with me to learn Spring and wrote half the
+code you see here. 
 
 
 * emacs settings  :archive:noexport:

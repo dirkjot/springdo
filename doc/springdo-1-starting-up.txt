@@ -233,6 +233,12 @@ public class ListOfItemsController {
 If you refresh your browser you should now see an empty todo list.
 Congratulations!  User story finished. 
 
+* Thanks!
+
+A big thanks to everyone who read and commented on this tutorial, to
+Pivotal Labs for letting me write these tutorials, and  to Navyasri
+Canumalla, who sat down with me to learn Spring and wrote half the
+code you see here. 
 
 
 

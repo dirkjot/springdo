@@ -1,0 +1,114 @@
+
+
+* settings 							   :archive:noexport:
+
+# Cx Ce this:
+(local-set-key [f12] (quote org-html-export-to-html))
+
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t num:nil toc:t
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+INFOJS_OPT:
+#+LATEX_HEADER:
+
+
+
+# video links, replace this for production:
+# insert with <y TAB
+#  +LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# http://orgmode.org/manual/Link-abbreviations.html#Link-abbreviations
+
+# github links, insert with <g TAB
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+#+LINK: google    http://www.google.com/search?q=%s
+
+# #+BEGIN_userstory
+# *User Story* A user can mark the (placeholder) task as completed
+# #+END_userstory
+
+
+
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+
+
+
+#+TITLE:  Working with users
+
+* Working with different users
+
+So far, the User Interface of our application has behaved as if there is only
+one user.  All todo items share one space and there is no login necessary.  In
+reality, we do want our fantastic application to have more than one user, in
+fact we want 1000s of them!  And our users probably do not want to
+share their todo items for all to see.  So let's go to the other extreme and
+make the notes private to a user.  We will later want to
+introduce note sharing between users, but that will be another episode.  
+
+#+BEGIN_userstory
+*User Story* 
+#+END_userstory
+
+
+* Spring Components
+
+The nice part of Spring is that there are many, many components to it and that a
+commonly encountered problem, like authentication, is probably already provided
+by Spring somewhere.  The Spring site https://spring.io/projects is dedicated to
+the projects and you can see which projects are available and what they do. In
+its current form (Fall 2015), the site fails to live up on its promises a bit:
+For example, the Spring Security tile has a 4 in the green top corner, which
+indicates that there are four sub-projects.  However, clicking on that does not
+show you these sub-projects, but you get a generic page on Spring Security
+instead.  
+
+Luckily, a few [[http://docs.spring.io/spring-security/site/docs/current/guides/html5/][clicks]] later, you will find the usual '5
+minute' introduction to Spring Authorization.  Note that this introduction is
+not necessary for this tutorial and it also was build with normal Spring in
+mind, not Spring Boot.  That means you start by downloading and installing java
+code, whereas we let Maven do that for us by including these lines:
+
+* TODO
+
+#+BEGIN_SRC xml
+                <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+#+END_SRC
+
+
+
+
+
+
+#+BEGIN_commit
+ [[github:]]
+#+END_commit
+
+See you next time!
+
+* Thanks
+
+A big thanks to everyone who read and commented on this tutorial, to
+Pivotal Labs for letting me write these tutorials, and  to Navyasri
+Canumalla, who sat down with me to learn Spring and wrote half the
+code you see here. 
+
+
+
+* emacs settings  :archive:noexport:
+
+Local Variables:
+mode: org
+fill-column: 80
+eval: (auto-fill-mode t)
+eval: (flyspell-mode t)
+End:

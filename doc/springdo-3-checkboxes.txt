@@ -375,13 +375,13 @@ your code works  (this code is already in the commit above):
 #+END_SRC
 
 *Lesson Learned* The ubiqutous use of the word 'item' is getting on my nerves.
-Why did we call it item and not just 'Thing'?   Or 'Widget', 'Foo' or [[https://goo.gl/2hkllH]['Thingamajigger']]?  More
-seriously, these are
-all bad names because they are too generic.  Part of the problem is that
-IntelliJ will syntax highlight the word TODO wherever it can.  If you commit
-from within IntelliJ, it will even ask you to review your TODO items before
-finalizing  the commit (you can switch this off).  That is normally
-great but not so much if you are writing an application about 'To Do Notes'.
+Why did we call it item and not just 'Thing'?  Or 'Widget', 'Foo' or
+[[https://goo.gl/2hkllH]['Thingamajigger']]?  More seriously, these are all bad
+names because they are too generic.   Part of the problem is that IntelliJ will
+syntax highlight the word TODO wherever it can.  If you commit from within
+IntelliJ, it will even ask you to review your TODO items before finalizing the
+commit (you can switch this off).  That is normally great but not so much if you
+are writing an application about 'To Do Notes'.
 
 Even though IntelliJ has a great renaming utility (highlight the word, right
 click, refactor, rename), this is a decently challenging rename given how 'item'
@@ -392,6 +392,14 @@ class a wrong name at one point, or the class will morph so the original (good)
 name does no longer apply.  Learning now how to get out of this situation will
 avoid endless confusion later on.  Refactor away!
 
+#+BEGIN_QUOTE
+There are only two hard problems in Computer Science: cache invalidation and naming things. - Phil Karlton
+#+END_QUOTE
+Every programmer can understand that cache invalidation is a really thorny
+problem, because there are just so many cases to think of and so many
+interactions that may occur.  Naming things is just as hard and, I would argue,
+more important as every programmer has to deal with it or suffer the
+[[https://www.quora.com/Why-is-naming-things-hard-in-computer-science-and-how-can-it-can-be-made-easier][consequences]].
 
 * Problems with AngularJS
 
@@ -470,6 +478,13 @@ finished, time to end this episode.
 #+END_commit
 
 See you next time!
+
+* Thanks!
+
+A big thanks to everyone who read and commented on this tutorial, to
+Pivotal Labs for letting me write these tutorials, and  to Navyasri
+Canumalla, who sat down with me to learn Spring and wrote half the
+code you see here. 
 
 
 * emacs settings  :archive:noexport:

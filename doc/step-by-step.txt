@@ -290,9 +290,57 @@ Date:   Wed Sep 23 13:55:06 2015 -0700
     added a test for the save end point
 
 
-** commits missed
+** commit ec3908d : thymeleaf logins / Login with a default username and password added. Logout added as a l
+
+added all deps and default thymeleaf forms for login
+- WebSecurityConfig.java
+- MvcConfig.java
+- login.htmnl with th
+- logoutbutton.html page with only a logout button (bad)
+- outdated changes to index.html
+
+
+** commit b555aeb: Disabling csrf protection provided by spring security so that the req
+disbled csrf in WebSecurityConfig
+added logout to index.html
+remove separate logout button page
+
+** commit 7133197: first step toward authentication, using inmemoryUserDetail
+- added user, userRepository and code in SpringdoApplication to add a
+  user on startup
+- changed WebSecurityConfig.java to start a InMemoryUserDetail 
+  thingie, and put a user in there by hand (users.put(..))
+
+
+** commit 8a26eae: second step toward users
+
+- add users from userREpo to InMemoryUserDetail
+- changed user class to be compatible with InMemoryUserDetail
+- remove manual put from InMemoryUserDetail
+
+
+** commit c08de66: working on only showing items of the currently logged in user
+- added many to one relationship between user and items
+- 
+
+** commit 273e00c: partially implemented showing user id in UI
+- some minor code to implement and use /resource/who
+- this is actually not valid, as not json
 
 ** commit 4362ab35762d5e1c61351791e85d654c07b986d8 getting users working
+
+"""
+User only sees the items that belong to them
+"""
+
+- renamed userId to user in Item
+- new constructor on Item (takes user)
+- search function on ItemRepo working (caps problem, findItemByUser)
+- moved init code around so items belong to users
+- redid /resource/who , now returns a map name:<name>  
+- TODO use singletonhash oid  java.util.Collections.singletonMap() 
+   [[http://www.tutorialspoint.com/java/util/collections_singletonmap.htm][link]]
+
 
 *NOTE* this is wrong because we do not actually read the user name, but list
 items of user 1 all the time.  it makes for a great incremental push though.
@@ -343,7 +391,16 @@ A few things went into this
 
 
 ** commit 0da5e06937fb440a09faed60adc0d3fe7ee60561  users fully working, incl new item
+"""
+Admin can view all items with owners, several changes in data models … …
+…to allow this.
+"""
+- redo item again, now with lots of @jsonview  (see below)
+- added jsonview to user.java
+- add admincontroller  and admin.html, admin.js
+- 
 
+older comments
 - adding admin interface to list all items with user details etc
 - changing user listOfItems to list items of the current user, not
   user 1

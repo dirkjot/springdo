@@ -1,0 +1,408 @@
+
+
+* settings 							   :archive:noexport:
+
+# Cx Ce this:
+(local-set-key [f12] (quote org-html-export-to-html))
+
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t num:nil toc:t
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+INFOJS_OPT:
+#+LATEX_HEADER:
+
+
+
+# video links, replace this for production:
+# insert with <y TAB
+#  +LINK: videos file:///Users/pivotal/Documents/spring-do-videos/%s.mov
+
+# http://orgmode.org/manual/Link-abbreviations.html#Link-abbreviations
+
+# github links, insert with <g TAB
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+#+LINK: google    http://www.google.com/search?q=%s
+
+
+
+#+LINK: github https://github.com/dirkjot/springdo/commit/
+
+
+
+#+TITLE:  Adding and deleting notes 
+
+* Adding a note
+
+At this point, we can edit a todo note.  We have a delete button,
+which we will deal with below.  We would like to *create* new notes so
+we have something to mark as done and then later delete, right?
+
+#+BEGIN_userstory
+*User Story* The user can add a todo item by clicking on a button. The
+ item is initially empty and not marked 'done'.  
+#+END_userstory
+
+
+We will attack this problem in a few steps.  First, we are going to
+create the frontend functionality, which includes:  1/ A button to add
+a todo item;  2/ a javascript function which creates an extra item in
+our =$scope.listofitems= array; 3/ some magic to show that new item.
+
+
+* Inserting items to the UI
+
+A button is easily made and we make no attempt to make it look nice:
+:  <div ng-click="plusbutton()">Plus</div>
+
+But when the =plusbutton= function is run, how are we going to add an
+item to the UI?  In a pre-AngularJS world, you may have thought to
+manipulate the DOM (the text on the browser's page) and insert an
+extra html item.  The most popular library for this is jQuery, which
+gives you convenient functions to locate the insertion point (here is
+a brief
+[[https://learn.jquery.com/using-jquery-core/selecting-elements/][overview]]
+of the things you *won't* need) and to create new items and insert
+them at some point (jQuery
+[[https://learn.jquery.com/using-jquery-core/manipulating-elements/#creating-new-elements][tutorial]]).
+
+AngularJS has some minimal version of jQuery built in, but for simple
+projects you won't need it as AngularJS can do the work for you.
+Remember that AngularJS has a two-way data binding?  Changing the UI
+state (via user input) immediately changes the javascript variables,
+and changing the javascript variables immediately changes the UI.
+This last point is obviously true for variable insertion, like
+=<p>{{item.content}}</p>=:  If we change =item.content=, the user's
+content will be updated.  Interestingly, this is also true for more
+complex AngularJS constructs, like:
+
+#+BEGIN_SRC html
+<ul>
+  <div ng-repeat="item for listofitems">
+     <li>{{item.title}</li>
+  </div>
+</ul> 
+#+END_SRC
+
+This will create a bulleted list of item titles. If we add an item to
+the javascript variable =listofitems=, AngularJS will also expand the
+list displayed to the user.  In fact, if we remove the 3rd item of the
+list, AngularJS will remove that item from the display and nicely
+animate its removal.  I have created a
+[[http://jsfiddle.net/dirkjot/httbh0hd/0/][JSFiddle]] that shows how
+this works with much of the complexity of our current html removed,
+play around with it to see how changing variables affects the UI.
+You can also checkout this
+[[http://www.java2s.com/Tutorials/AngularJS/AngularJS_Example/Scope/Add_new_item_to_UL_list.htm][other\nbsp{}tutorial]]. 
+
+
+As you can see, AngularJS uses a short animation to make it clear to
+the user what is happening: If you instantly remove an item from a
+list, chances are the user will never notice it.  The animation
+support in Angular has changed quite a bit over time and the new 2.0
+version is supposed to be fully centered around it.  In this
+[[http://jsfiddle.net/dirkjot/httbh0hd/2/][second\nbsp{}fiddle]], you
+can explore how changing the animation parameters is a matter of
+adding a class on the =ng-repeat= element and then using CSS to supply
+animation parameters for that transition.  More explanation and demos
+of some quite over the top animations (like 3D rotation) are shown
+over at
+[[http://www.nganimate.org/angularjs/ng-repeat/3d-rotate][nganimate.org]].
+
+
+
+
+* Templates
+
+In the example above and in the JSFiddle, our loop looks very neat and
+tidy because we just write the item's title with
+=<li>{{item.title}}=.  The current code in =index.html= is much harder
+to read because of the viewing and editing state of each item, and the
+logic for showing and hiding content.  Wouldn't it be nice if our loop
+could be written like
+#+BEGIN_SRC html
+           <div ng-repeat="item in listofitems">
+                <div ng-include src="'itemform.html'"></div>
+           </div>
+#+END_SRC
+
+In fact, we can do just that by providing a 'partial', an html
+fragment for insertion into our current pages.  Note the double
+quotation on the partial:  The name is a constant that needs quoted
+once for html and once more for AngularJS.  The canonical source of a
+partial is to download it separately, here we inline it:
+: <script type="text/ng-template" id="itemform.html">
+:    <div class="list-group-item row">  <!-- rest of template goes here -->
+
+The partial makes our html much more readable and it would also be a
+nice solution if we generated items in two places (which we currently
+don't do).  Another approach would be to create your own
+AngularJS directive, ie. a new pseudo html element like =<myitem ..>=.
+Directives are very powerful and recommended when you are rewriting
+the DOM; they are overkill for this simple application.  The main
+advantage of a directive is that it has its own scope, just like a
+javascript function has its own local variables.  This allows you to
+write reusable code that does not depend on the parent scope, like an
+include does.  This stackoverflow
+[[http://stackoverflow.com/questions/24171893/angularjs-nginclude-vs-directive][answer]]
+discusses the differences in more detail.
+
+
+* New versus create
+
+*TLDR*  A =create= endpoint is better than a =new= endpoint.
+
+Something slipped into the last commit that should technically not
+have been there (splitting up historical commits to make a good
+tutorial is more
+[[http://sethrobertson.github.io/GitPostProduction/gpp.html][complicated]]
+than you think).  At the bottom of ListOfItemsController, I wrote a
+note to myself on a future endpoint for creating a new note:
+: post('/resource/new/title/content/done/')
+That seemed like a logical choice, but there are a few problems that we
+encountered when we thought it through.  
+
+Let's first talk about the big benefit of this approach, namely
+unconnected operation.  The frontend can create a note and allow the
+user to edit it without contacting and possibly waiting for the
+backend.  That is a big gain, but it also means that if the backend is
+unavailable, we can only signal an error when the user has entered and
+edited the complete note.  It is not hard to predict what users will
+think, say or shout when a note disappears into virtual reality upon
+hitting 'Submit'.  It is much better to not let them create a new note
+if the server is unavailable, as the users will not lose any work.  In
+the worst case, they will pick up their pencil-and-paper todo list
+again.
+
+We could of course design some fancy local storage for the note and
+have the frontend and backend talk asynchronously.  This sounds like a
+great project if you want to learn more about asynchronous operation!
+But before you start, this may work very well for mobile apps (where
+this type of operation is quite common), but it is much less well
+suited for a webbrowser.  The infrastructure is there: we can use
+/localStorage/ from the
+[[https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API][WebStorage\nbsp{}API]],
+which will allow us to store a key-value pair that persists over
+browser restarts.  
+
+However, the modern user often uses different browsers at different
+points over the day.  They will seamlessly switch from Chrome to
+Firefox and onward to the browser on their phone or tablet.  Imagine
+we used /localStorage/ on a tablet browser, but the tablet was shut
+down soon after the note was created so the change is never propagated
+to the server.  The user will not understand what happened with that
+note and be even more surprised when it resurfaces a day or so later,
+when the tablet was started up again for completely different reasons.
+There is only one way in which we can provide persistent storage over
+browsers: using our own backend.
+
+Instead of a =save= endpoint, we will be using a =create= endpoint
+which returns the ID and contents of an empty note.
+This has the aforementioned disadvantage of not being able to start a
+new note if you are offline.  It solves an issue we had not addressed
+yet:  Each note has to have a unique ID and in an offline operation,
+we would have to rely on large random numbers to avoid collision (for
+example using
+[[http://docs.oracle.com/javase/7/docs/api/java/util/UUID.html][UUID.randomUUID]]).
+The current system makes our backend the only source of IDs so it is
+easy to maintain uniqueness.   Why does the =create= endpoint return
+the contents of an empty node when that is, well, empty?? In the
+future, the server could add all kinds of metadata to the note (like
+date created, user profile) or it could serve several types of
+skeleton notes (shopping lists, holiday todos etc).  We don't use this
+functionality now but it is good to keep that option in there. 
+
+
+*TLDR* Server generated unique IDs scale / Now what happens if our
+excellent ToDo service goes viral, we have 10,000s of users and we
+need multiple many backend servers?  How do we maintain uniqueness
+under that scenario?  We could just tie each user to one a specific
+backend server and that server would continue to provide unique IDs
+for those user, just like in the simple case.
+
+
+* Can we finally see some code?
+
+This is all fine and well but our User Story has not been addressed at
+all.  Let's fix that fast, by first making a frontend only solution
+that just shows that we can do this.  We added a simple button to our
+html above, that calls the =plusbutton= function.  A simple-minded way
+to implement that function would be:
+
+#+BEGIN_SRC javascript
+$scope.plusbutton = function () {
+	$scope.listofitems.push({"id": 6, "title": "new item", "content": "Hi", "done": "no"});
+};
+#+END_SRC
+
+Full code is in the commit below.  When you check it out, it will work
+just fine and add a dummy item when you click the button.  You can hit
+the button multiple times and get multiple new items.  Try opening one
+of the new items and you see we have introduced a bug.  Can you figure
+out what causes this behavior?
+#+BEGIN_commit
+ [[github:31cdff924c255d3a896f97ff9a62ba2cff608fc2]]
+#+END_commit
+
+
+That was great, we are ready to actually move this to the
+backend. Let's do this right and start by writing a test for the
+backend functionality:
+
+#+BEGIN_SRC java
+   @Test
+   public void whenCreateIsHitANewItemIsCreatedAndReturned() throws Exception {
+       mvc.perform(get("/resource/create/"))
+               .andExpect(status().isOk())
+               .andDo(print())
+               .andExpect(jsonPath("$.title", is("")))
+               .andExpect(jsonPath("$.content", is("")))
+               .andExpect(jsonPath("$.done", is("no")));
+   }
+#+END_SRC
+
+The new javascript function is a little more complicated than our old
+one, but nothing too fancy:  We do a GET request to the =new=
+endpoint and put a success function in that captures the returning
+data.  As a slight novelty, the data is not only the item's ID but the
+full item this time (this assumes all our items are JSON
+serializable).  We add the item to =listofitems= (javascript), expand
+the new item and start edit mode on it.
+
+#+BEGIN_SRC javascript
+        $scope.plusbutton = function () {
+                $http.get('resource/create/').then(function(success) {
+                        newitem = success.data;
+                        $scope.listofitems.push(newitem);
+                        $scope.toggleContent(newitem.id);
+                        $scope.goedit(newitem);
+                });
+        };
+#+END_SRC
+
+The definition of the endpoint is even shorter:  All we have to do is
+create a new =Item=, save it to the database and return it.
+#+BEGIN_SRC 
+    @RequestMapping(value="/resource/create/", method=RequestMethod.GET)
+    Item postSaveUpdate() {
+        Item item = itemRepository.save(new Item());
+        return item;
+    }
+#+END_SRC
+
+If you run the example, you can see that you can reload the page and
+your changes persist.  We have implemented saving new notes.
+
+#+BEGIN_commit
+ [[github:9689d734ae8dbca2443485e9fc9c23c543b147df]]
+#+END_commit
+
+
+There is a small UI error with our version so far: When you create a new item
+and hit 'Submit' right away, you get an empty title field.  There is nothing
+inherently wrong with that, other than that that means there is nothing to click
+on any more, which means we cannot open the item, which in turn means that we
+cannot edit it anymore. Before you read on, take a moment to think how you would
+solve this, or maybe even solve it.  Two solutions are sketched next.
+
+A quick fix would be to add a bit of space (non
+breaking space, =&nbsp;=) to the end of the title, so there is always something
+clickable there:
+: <div ng-click="toggleContent(item.id)"><b>{{item.title}}</b>&nbsp;</div>
+
+A better solution is to check whether there is a title and display a substitute
+title if there is none.  This can be done with the =ng-if= directive, which
+removes a html element if the 'if' is not true:
+#+BEGIN_SRC html
+                <div ng-click="toggleContent(item.id)">
+                    <b>{{item.title}}</b>
+                    <span ng-if="item.title.length == 0">-No Title-</span>
+                </div>
+#+END_SRC
+
+This is what the result looks like:
+
+[[http://3.bp.blogspot.com/-DYhk1J483d4/Vh17mZDRtyI/AAAAAAAAQxc/wF3l9JCUhUI/s400/Screen%2BShot%2B2015-10-13%2Bat%2B2.45.16%2BPM.png]]
+
+* Deleting a note
+
+Deleting a note is the 'D' in the CRUD acronym of common interfaces.  This means
+that JPA is ready to deal with it, it provides a =delete(id)= call to handle
+item deletion (there are several other ways to call delete, see the
+[[http://docs.spring.io/spring-data/jpa/docs/current/api/org/springframework/data/jpa/repository/support/SimpleJpaRepository.html#delete][docs]]).  
+
+Before we start writing the code, we should write the test.  We then run the
+test and watch it fail, because the endpoint does not exist yet.
+#+BEGIN_SRC java
+    @Test
+    public void whenDeleteIsHitItemIsTrashed() throws Exception {
+        // setup
+        String newtitle = "New Test Title";
+        Item item = new Item("Test Todo", "Do Lots of stuff - then delete");
+        itemRepository.save(item);
+        // now remove it
+        mvc.perform(post(String.format("/resource/delete/%d/", item.id)))
+                .andExpect(status().isOk());
+        Item newItem = itemRepository.findOne(item.id);  // returns Null if not found
+        assertNull(newItem);
+    }
+#+END_SRC
+
+Now for the implementation: On the html side, we add a click function to the
+trash can icon: =godelete(item)=.  This javascript function will contact the endpoint and
+if deletion was successful, delete the item locally:
+
+#+BEGIN_SRC 
+    $scope.godelete = function (item) {
+        $http.post('/resource/delete/' + item.id + '/').then(
+            function (success) {
+                listofitems = $scope.listofitems;
+                for (i = listofitems.length - 1; i >= 0; i--) {
+                    if (listofitems[i].id == item.id) {
+                        listofitems.splice(i, 1);
+                    } } }); };
+#+END_SRC  
+In a future version, we should get an update from the server telling us what the
+change in the =listofitems= is, for now we just remove the item ourselves.  This
+is not great because we are duplicating the actions on the backend in the
+frontend, and this will surely come back and bite us one day.  But it is really
+ok for now.
+
+The endpoint is a simple application of JPA =delete=, as promised:
+#+BEGIN_SRC java
+    @RequestMapping(value="/resource/delete/{id}") //, method=RequestMethod.POST)
+    String deleteItem(@PathVariable long id) {
+        itemRepository.delete(id);
+        return "[\"ok\"]";
+    }    
+#+END_SRC
+
+#+BEGIN_commit
+ [[github:3528ae029757c1e18ff8b916d247e0cda132b211]]
+#+END_commit
+
+See you next time!
+
+* Thanks
+
+A big thanks to everyone who read and commented on this tutorial, to
+Pivotal Labs for letting me write these tutorials, and  to Navyasri
+Canumalla, who sat down with me to learn Spring and wrote half the
+code you see here. 
+
+
+
+* emacs settings  :archive:noexport:
+
+Local Variables:
+mode: org
+fill-column: 80
+eval: (auto-fill-mode t)
+eval: (flyspell-mode t)
+End:
