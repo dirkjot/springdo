@@ -1,12 +1,17 @@
 package io.pivotal;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by pivotal on 9/21/15.
@@ -16,18 +21,23 @@ import java.util.*;
 public class ListOfItemsController {
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @JsonView(JsonViews.ItemList.class)
     @RequestMapping(value="/resource/list/", method= RequestMethod.GET)
-    List listOfItems() {
-        Iterable<Item> iterable = itemRepository.findAll();
+    public List listOfItems(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName());
+        Iterable<Item> iterable = itemRepository.findByUser(user);
         List<Item> result = new ArrayList<>();
         iterable.iterator().forEachRemaining(result::add);
         return result;
     }
 
     @RequestMapping(value="/resource/dummylist/", method= RequestMethod.GET)
-    List listOfDummyItems() {
+    public List listOfDummyItems() {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         Map<String, String> map1 = new HashMap<String, String>();
         map1.put("id", "1");
@@ -96,16 +106,25 @@ public class ListOfItemsController {
      * Create a new todo item
      * @return full item representation, with empty fields
      */
-    @RequestMapping(value="/resource/create/", method=RequestMethod.GET)
-    Item postSaveUpdate() {
-        Item item = itemRepository.save(new Item());
-        return item;
+    @JsonView(JsonViews.ItemList.class)
+    @RequestMapping(value="/resource/create/", method=RequestMethod.POST)
+    Item postCreate(Principal principal) {
+        if (principal != null) {
+            User user = userRepository.findByUsername(principal.getName());
+            if (user != null) {
+                Item item = itemRepository.save(Item.empty(user));
+                return item;
+            }
+        }
+        System.err.println("Unauthorized request to /resource/create/ by " + principal);
+        return null;
     }
 
-    /**
-     * A delete method.  In line with traditional REST, we use the post method here.
-     */
-    @RequestMapping(value="/resource/delete/{id}") //, method=RequestMethod.POST)
+
+/**
+ * A delete method.  In line with traditional REST, we use the post method here.
+ */
+    @RequestMapping(value="/resource/delete/{id}", method=RequestMethod.POST)  // DPJ
     String deleteItem(@PathVariable long id) {
         itemRepository.delete(id);
         return "[\"ok\"]";

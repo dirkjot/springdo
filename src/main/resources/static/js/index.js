@@ -1,9 +1,17 @@
 angular.module('index', []).controller('home', function($scope, $http) {
 
+
 	$http.get('resource/list/').success(function(data) {
 		//$scope.greeting = data;
 		//$scope.greeting = {id: 'xxx', content: 'Hello World!'};
 		$scope.listofitems = data; });
+
+
+	$scope.springdoUserName = "<Unknown>";
+
+	$http.get("/who/").success(function(data) {
+		$scope.springdoUserName = data["name"];
+	});
 
 	$scope.onDoneClick = function (item) {
 			$http.post('/resource/done/' + item.id + '/' + item.done + '/')
@@ -41,7 +49,7 @@ angular.module('index', []).controller('home', function($scope, $http) {
 	};
 
 	$scope.plusbutton = function () {
-		$http.get('resource/create/').then(function(success) {
+		$http.post('resource/create/').then(function(success) {
             newitem = success.data;
 			$scope.listofitems.push(newitem);
 			$scope.toggleContent(newitem.id);

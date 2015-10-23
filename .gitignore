@@ -19,13 +19,18 @@ hs_err_pid*
 
 # project files
 .gradle/
-.idea/workspace.xml
-.idea/tasks.xml
 build/
 target/
 out/
 # intellij personal project settings:
 springdo.ipr
+
+# always ignore these when working with intellij
+.idea/workspace.xml
+.idea/tasks.xml
+
+# because we do eclipse style settings, we can ignore the whole .idea directory
+.idea/
 
 # documentation output
 doc/*.html
