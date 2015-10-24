@@ -52,9 +52,27 @@ share their todo items for all to see.  So let's go to the other extreme and
 make the notes private to a user.  We will later want to
 introduce note sharing between users, but that will be another episode.  
 
+In essence the user story here is /there be users/.    It is useful to split
+that up in smaller parts:  First we will secure our site, so only authenticated
+users can log in. They will still see the one large list of todo items because
+items are not linked to users yet.
+
 #+BEGIN_userstory
-*User Story* 
+*User Story*  6a: A user can log in with a password to see the otherwise secured site.
 #+END_userstory
+
+After we have users and a login method, we can link items to users:
+
+#+BEGIN_userstory
+*User Story*  6b: A user should only see the items that belong to them.
+#+END_userstory
+
+and of course
+
+#+BEGIN_userstory
+*User Story*  6c: When a user creates a new item, it belongs to them.
+#+END_userstory
+
 
 
 * Spring Components
@@ -62,20 +80,27 @@ introduce note sharing between users, but that will be another episode.
 The nice part of Spring is that there are many, many components to it and that a
 commonly encountered problem, like authentication, is probably already provided
 by Spring somewhere.  The Spring site https://spring.io/projects is dedicated to
-the projects and you can see which projects are available and what they do. In
+the projects and you can see which projects are available and what they do (in
 its current form (Fall 2015), the site fails to live up on its promises a bit:
-For example, the Spring Security tile has a 4 in the green top corner, which
-indicates that there are four sub-projects.  However, clicking on that does not
-show you these sub-projects, but you get a generic page on Spring Security
-instead.  
+Sub projects are not visible and it is low on actual information what the
+projects do, but this will surely be improved upon soon). 
 
-Luckily, a few [[http://docs.spring.io/spring-security/site/docs/current/guides/html5/][clicks]] later, you will find the usual '5
-minute' introduction to Spring Authorization.  Note that this introduction is
-not necessary for this tutorial and it also was build with normal Spring in
-mind, not Spring Boot.  That means you start by downloading and installing java
-code, whereas we let Maven do that for us by including these lines:
+Luckily, a few [[http://docs.spring.io/spring-security/site/docs/current/guides/html5/][clicks]] later, you will find the usual '5 minute' introduction to
+Spring Authorization and you can find more info on Spring Security in general.
+Note that this introduction is not necessary for this tutorial and it also was
+build with normal Spring in mind, not Spring Boot, but it makes for good reading
+regardless.  Much of what follows below is based on it.
 
-* TODO
+
+* Adding Spring Boot Security
+
+To add a new part of Spring to our project we have to first tell our build tool
+(Maven) about the new dependency and then have it download the necessary files.
+To do so, double click the =pom.xml= file on the top level of the project.  In
+IntelliJ, you can right click anywhere in the file and choose 'Generate', then
+'Managed Dependency'.  IntelliJ will show a scrollable list of all available
+dependencies, from which you should choose 'spring-boot-starter-security'.  This
+should generate a new dependency in your =pom.xml=, like so:
 
 #+BEGIN_SRC xml
                 <dependency>
@@ -84,16 +109,226 @@ code, whereas we let Maven do that for us by including these lines:
 		</dependency>
 #+END_SRC
 
+*Aside*: There is also a 'Generate: Dependency' option and the difference does
+not seem to be covered the in the IntelliJ documentation.  According to this
+older [[https://devnet.jetbrains.com/thread/449325;jsessionid=9A807D15704BDCCB83154BEBD22A5348][question]], the position in the =pom.xml= differs between managed and normal
+dependencies (for the curious, /managed dependencies/ explained by [[https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html][Maven]]).  For
+us, the interface of 'Generate: Dependency' is easier but some dependencies
+cannot be included that way, so I advise to use 'Generate: Managed Dependency'.
+
+If you were to run the project now, you would likely see the following error:
+
+[[http://2.bp.blogspot.com/-gxfOXNfY918/ViFf6xJxRoI/AAAAAAAAQyo/ltCHcbqMQ8w/s1600/Screen%2BShot%2B2015-10-16%2Bat%2B1.34.45%2BPM.png]]
+
+After you have made any changes to the =pom.xml=, you need to run the Maven
+targets (harder) or tell IntelliJ to act upon the new information (easier).
+Often, IntelliJ will pop up a message saying that the Maven project files need
+to be reread.  Say yes to this.  Alternatively, enable automatic reimporting
+under the settings menu, "Import Maven projects automatically":
+
+[[http://1.bp.blogspot.com/--e0fGiLBVio/ViFf7jZoUbI/AAAAAAAAQys/_fXbUjwTmRQ/s400/Screen%2BShot%2B2015-10-16%2Bat%2B12.32.26%2BPM.png]]
+
+
+A third way to have IntelliJ sync to the maven settings is to open the Maven tab
+(View menu, then Tool windows, Maven project) and use the shortcuts presented
+there. To alert IntelliJ to your maven changes, click the first button (two
+arrows in a cirle).  To download files, click the second button (folder icon
+with two arrows).  Always make sure the 7th item, /offline mode/ (representing
+by a disconnected cable icon) is in its deselected state, as Maven will not
+download any required dependencies in offline mode.
+
+[[http://4.bp.blogspot.com/-Wob-YGPfdZg/ViFf64NAD9I/AAAAAAAAQyk/9i32yzonCis/s1600/Screen%2BShot%2B2015-10-16%2Bat%2B1.35.39%2BPM.png]]
+
+If all else fails, you can run the project from Maven directly, using the
+'spring-boot:run' action.  On the command line, you would do this by typing:
+`mvn spring-boot:run`.  Before running the project, Maven will want to compile
+it and to do that, it will first pull in (download) all the dependencies.
+
+
+*TLDR* We use Maven here but we like Gradle better */* Worken with Maven is not
+always very intuitive.  The original version of this project was set up with
+Gradle instead of Maven.  These two build systems are both very good,
+exhaustively documented and more than a little challenging when you first use
+them.  Luckily IntelliJ (and any other IDE) makes things easier for you by
+giving you attractive buttons to click on.  Gradle has the distinct advantage
+that its configuration file =build.gradle= is precisely 100 times more readable
+than Maven's =pom.xml= and there are a few other [[http://www.drdobbs.com/jvm/why-build-your-java-projects-with-gradle/240168608][advantages]] too.  However,
+almost all of the Spring (Boot) docs are made with Maven in mind, so we stuck to
+that convention here.
+
+# TODO : add gradle section later on
+
+
+
+* What is inside spring-boot-starter-security?
+
+We used the dependency 'spring-boot-starter-security'.  The 'starter' packages
+are convenient high-level dependencies supplied by Spring Boot: Instead of
+having to include a number of things, you just include the starter which will
+pull in the packages you would normally need for this task.  In IntelliJ, you
+can inspect the file =springdo.iml= to see how IntelliJ has integrated.  Here, I
+went to the 'version control' tab to do a diff on that file, showing that next
+to 'spring-boot-starter-security', nine other packages were pulled in:
+
+[[http://4.bp.blogspot.com/-GobsptMaqrw/ViFf68Dtz0I/AAAAAAAAQyg/ziJ1Gk63_Xw/s1600/Screen%2BShot%2B2015-10-16%2Bat%2B1.33.57%2BPM.png]]
+
+
+
+Because the way Spring Boot works, reasonable defaults are assumed whenever no
+configuration is given.  For the starter-security this means that without any
+further confirmation, your site will be locked down.  When you go to any page, a
+browser-native login screen will be shown like this one: 
+
+[[http://2.bp.blogspot.com/-Ruiw7iRup8c/ViU0WjDtm_I/AAAAAAAAQ08/1-h5VZKIm6c/s320/Screen%2BShot%2B2015-10-19%2Bat%2B11.18.59%2BAM.png]]
+
+This is not very helpful, but it is a reasonable default. The security suite
+can also create a default login form and other goodies, but we will not explore
+those here as they depend on Thymeleaf, a template engine which can help you
+serve pages from the server directly.  Because we use Angular for the front end,
+our back end only outputs 'information', in the form of JSON packets, and never
+actual pages.  
+
+
+* Making login work
+
+To make login work, we need to give the users a place to login.  A page
+'credentials.html' was created (specifically named like that because Spring
+security will automatically provide a 'login' page and we wanted to avoid
+confusion).  I have deleted some source (marked =// ..=) to provide focus on the
+essential parts:
+
+#+BEGIN_SRC html
+<html ng-app="credentials">
+  // ...
+<div class="container">
+    <div ng-controller="credentials" ng-cloak class="ng-cloak">
+        <h1>Please log into SpringDo</h1>
+
+        <form name="credentialform" ng-submit="gosubmit()" role="form">
+            <div><label> User Name : <input type="text" ng-model="username" autofocus="true"/> </label></div>
+            <div><label> Password: <input type="password" ng-model="password" /> </label></div>
+            <div><input type="submit" value="Sign In"/></div>
+        </form>
+        <div></div>
+   // ...
+    </div>
+</div>
+#+END_SRC
+
+We set up a simple form which is bound to the javascript variables =username=
+and =password=.  The 'Submit' button is tied to the =gosubmit= function, defined
+in the matching javascript:
+
+#+BEGIN_SRC javascript -n
+angular.module('credentials', ['ngRoute'])
+    .controller('credentials', function($scope, $http, $window) {
+        $scope.username = "navya";
+        $scope.password = "secret";
+        $scope.reminder = false;
+
+        $scope.gosubmit = function() {
+            var request = {
+                method: 'POST',
+                url: '/credentials.html',
+                data: $.param({username: $scope.username, password: $scope.password}),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded', }, };
+            $http(request).then(
+                function (success) {
+                    console.log("success", success);
+                    $window.location.href = "/index.html";  },  // rather heavy handed
+                function (failure) {
+                    console.log("failure", failure); });
+            };
+    });
+
+#+END_SRC
+
+By setting the javascript variables =$scope.username= and =.password=, we
+populate the form elements, which makes testing much faster.  The work is done
+in the =gosubmit= function, which has to check the supplied username and
+password with the backend.  It does that through a POST back to the same path we
+are on, with the username and password in the body of the POST.  The =$param=
+function will format a javascript map into a http body for us. We need to set
+the content-type correctly otherwise Spring will not accept the POST.
+
+If the authorization is successful, we forward the user to the main page with
+the =$window.location.href= function.  This causes a rather ugly refresh, but we
+will leave that for now.  If you are interested, there is a matching =$location=
+directive in Angular that is more lightweight and will create a smoother
+transition. It is a little more work to make it work in this context, so we left
+it out here.
+
+If the authorization fails, a counter-intuitive thing happens: The post action is still
+succesful but the user is not authorized.  Because the post is successful, the
+'success' branch is run and the user's browser is forwarded to =index.html=.
+However, because authorization has not succeeded, the Spring security framework
+will throw a 302 error and redirect the user back
+to the =credentials= page.  This does cause a fair amount of flashing and on the
+whole is not much of a great user experience, but we will leave it in place for
+now.  
+
+--here--
+
+
+It is hard to follow the messages that are displayed during login, as the page
+changes.  To make this easier, have the log persist over page changes: In the
+Chrome developer tools, go to the settings menu (three vertical dots) and check
+'Preserve log upon navigation'.  The same setting can be found in Firebug.
 
 
 
 
+DIRK:
+- can we make the standard security work with the post??
+- can we just use the thymeleaf security stuff??
 
-#+BEGIN_commit
- [[github:]]
-#+END_commit
 
-See you next time!
+MERGE
+- admincontroller merge on delete, error: could not apply a058d9e... Login
+  working, csrf disabled for now
+- same for admin.html
+
+*Aside* on cookies and browser state: When working with authentication, you will
+sometimes run into weird errors.  My favorite was an AngularJS message in the
+console showing that an AngularJS assertion (=areq=) had failed.  If this
+happens to you, often the solution is as simple as opening a fresh anonymous
+browser window to make sure you do not have any tokens and cookies floating
+around.
+
+
+
+
+*  STUFF TO ADD
+
+https://spring.io/blog/2013/07/11/spring-security-java-config-preview-readability/
+blog on how to format security props
+
+do a form post from angular
+http://stackoverflow.com/questions/11442632/how-can-i-post-data-as-form-data-instead-of-a-request-payload
+
+html login form, browser version
+[[http://2.bp.blogspot.com/-Ruiw7iRup8c/ViU0WjDtm_I/AAAAAAAAQ08/1-h5VZKIm6c/s320/Screen%2BShot%2B2015-10-19%2Bat%2B11.18.59%2BAM.png]]
+
+
+
+* Resources
+
+This is a very long post (actually seven posts combined into one tutorial;
+reading the Github =Readme.adoc= files may be easier) that
+deals with all kinds of aspects of Spring, AngularJS and security.  Part 2
+(subdirectory 'Single' in the github repo) helped me write the code for this
+episode.  Dave Syer starts out with the basics, then moves on to such topics as
+having security and content on different servers and using OAuth.  It is highly
+recommended reading if you want to dive much deeper into that area.
+https://spring.io/guides/tutorials/spring-security-and-angular-js/
+and https://github.com/dsyer/spring-security-angular/blob/master/overview.adoc.
+
+
+Testing with CSRF protection on requires some extra work, see
+http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#test-mockmvc-csrf
+
+
 
 * Thanks
 
@@ -102,7 +337,6 @@ Pivotal Labs for letting me write these tutorials, and  to Navyasri
 Canumalla, who sat down with me to learn Spring and wrote half the
 code you see here. 
 
-#+HTML: <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">The text and imagery of the SpringDo Tutorial</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/dirkjot/springdo" property="cc:attributionName" rel="cc:attributionURL">Dirk P. Janssen</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
 
 
 * emacs settings  :archive:noexport:

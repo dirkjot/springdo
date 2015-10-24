@@ -261,6 +261,13 @@ Specifically,
   endpont =/resource/list/=.
 
 
+*Lesson Learned*  There are emerging conventions for which endpoints and which
+HTTP verbs should be used for standard operations like read, update and delete.
+We are not following these conventions here, sorry.  We will return to this in a
+later episode.  
+
+# TODO rename endpoints and use ngresource, in one episode
+
 As we are going to modify the backend, we can use the preferred Pivotal methodology:
 Writing a test before we write the code.  Tests go in a specific place in the
 hierarchy and are usually called after the controller they test. Here is the
