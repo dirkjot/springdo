@@ -195,7 +195,7 @@ To make login work, we need to give the users a place to login.  A page
 'credentials.html' was created (specifically named like that because Spring
 security will automatically provide a 'login' page and we wanted to avoid
 confusion).  I have deleted some source (marked =// ..=) to provide focus on the
-essential parts:
+essential parts of =credentials.html=:
 
 #+BEGIN_SRC html
 <html ng-app="credentials">
@@ -217,7 +217,7 @@ essential parts:
 
 We set up a simple form which is bound to the javascript variables =username=
 and =password=.  The 'Submit' button is tied to the =gosubmit= function, defined
-in the matching javascript:
+in the matching javascript, =credentials.js=:
 
 #+BEGIN_SRC javascript -n
 angular.module('credentials', ['ngRoute'])
@@ -245,19 +245,29 @@ angular.module('credentials', ['ngRoute'])
 #+END_SRC
 
 By setting the javascript variables =$scope.username= and =.password=, we
-populate the form elements, which makes testing much faster.  The work is done
-in the =gosubmit= function, which has to check the supplied username and
-password with the backend.  It does that through a POST back to the same path we
-are on, with the username and password in the body of the POST.  The =$param=
-function will format a javascript map into a http body for us. We need to set
-the content-type correctly otherwise Spring will not accept the POST.
+populate the form elements, which makes testing much faster.  Obviously we would
+remove this for a production version of the app.  A nicer approach would only
+populate these fields if we are on localhost.    
 
-If the authorization is successful, we forward the user to the main page with
+The work is done in the =gosubmit= function, which has to check the supplied
+username and password with the backend.  It does that through a POST back to the
+same endpoint, with the username and password in the body of the POST.
+The =$param= function will format a javascript map into a http body for us. We
+need to set the content-type correctly otherwise Spring will not accept the
+POST (this is a gotcha that took me at least one full hour to fix).
+
+If the authorization is successful the =success= function is called and we forward the user to the main page with
 the =$window.location.href= function.  This causes a rather ugly refresh, but we
 will leave that for now.  If you are interested, there is a matching =$location=
 directive in Angular that is more lightweight and will create a smoother
 transition. It is a little more work to make it work in this context, so we left
 it out here.
+
+*Aside* on persistent console logs: It is hard to follow the console messages that are displayed during login, as the page
+changes.  To make this easier, have the log persist over page changes: In the
+Chrome developer tools, go to the settings menu (three vertical dots) and check
+'Preserve log upon navigation'.  The same setting can be found in Firebug.
+
 
 If the authorization fails, a counter-intuitive thing happens: The post action is still
 succesful but the user is not authorized.  Because the post is successful, the
@@ -268,13 +278,351 @@ to the =credentials= page.  This does cause a fair amount of flashing and on the
 whole is not much of a great user experience, but we will leave it in place for
 now.  
 
---here--
+The failure branch is only reached if the server has gone offline.  In general,
+it is hard to handle that situation correctly:  The server was up when the page we were on
+was served but has gone down since.  The best we can do is tell the user to try
+again and not showing any reaction will (implicitly) give the same message.
+Only in large javascript apps that maintain extensive local state (like Gmail), does it
+make sense to try to retry the server and send the new information after all.
+Keep in mind that at that point, you will also have to disambiguate between two
+possible causes of this error:  Either the data never reached the server; or the
+data did reach the serve and the server state was adjusted but the server reply
+never reached us.  
+
+*Aside* on cookies and browser state: When working with authentication, you will
+sometimes run into weird errors.  My favorite one is an AngularJS message in the
+console showing that an AngularJS assertion (=areq=) had failed.  If this
+happens to you, often the solution is as simple as opening a fresh anonymous
+browser window to make sure you do not have any tokens and cookies floating
+around.  A hard refresh (shift-control-R or shift-command-R) will not do the
+same thing.
+
+** Backend changes
 
 
-It is hard to follow the messages that are displayed during login, as the page
-changes.  To make this easier, have the log persist over page changes: In the
-Chrome developer tools, go to the settings menu (three vertical dots) and check
-'Preserve log upon navigation'.  The same setting can be found in Firebug.
+This login function does not work without a large number of changes in the
+backend.  
+
+First of all, we need to create a database of users.  To this end, we create a
+User class, which is also a JPA Entity.  To later interface with the Spring
+Security framework, we inherit from =UserDetails=
+(org.springframework.security.core.userdetails.UserDetails), an interface which
+requires a number of methods like =getPassword=, =getUsername=, and =isEnabled=
+(see the [[http://docs.spring.io/autorepo/docs/spring-security/4.0.3.RELEASE/apidocs/org/springframework/security/core/userdetails/UserDetails.html][Spring docs]] for full details).
+
+The essence of the User class is only a few lines of code:
+#+BEGIN_SRC java
+@Entity
+public class User implements org.springframework.security.core.userdetails.UserDetails {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    public long id;
+
+    @OneToMany(mappedBy = "user")  // what this is called on the 'many' side
+    private List<Item> items = new ArrayList<>();
+
+    @JsonView(JsonViews.ItemList.class)
+    private String username;  // login credential
+
+    @JsonView(JsonViews.UserDetails.class)
+    private String password;
+
+    @JsonView(JsonViews.UserDetails.class)
+    private String email;  // for password reminders etc
+
+    @JsonView(JsonViews.UserDetails.class)
+    private Boolean isAdmin = false;  // has access to admin pages?
+#+END_SRC
+
+We declare the data fields we need, they will be given getters further down in
+the code.  There are no setters currently, as we are not modifying users yet,
+only creating them. The =items= field warrants some explanation:  Each todo item
+is owned by one user, and each user has many items.  Hence we have a many-to-one
+relationship between items and user.  On the user side, we express this with a
+=@OneToMany=, which takes as an argument the name of the variable on the Item
+side.  On the Item.java side, we have a matching line:
+#+BEGIN_SRC java
+    @ManyToOne
+    public User user;
+#+END_SRC 
+
+Together, these two code fragments allow us to use a natural interface on both
+entities: Items have a =user= variable which holds the User class that owns this
+item, from the outside we can do =anItem.getUser= to access it.  Similarly, we
+a User object has a list of entities accessible via =items=, or
+=aUser.getItems=, neither of which are currently used but may come in handy soon.  
+
+Note that there is no actual =User= variable on an Item, and there is no
+=List<Item>= on the User.  Instead, these are magically supplied by the JPA from
+a hidden join table which has two columns, one for the UserId and one for the
+ItemId.  Accessing =anItem.getUser()= is doing a query on that table for that
+ItemId, similar to =SELECT userid from JOINTABLE where itemid = ?1=. The
+returned UserId is converted into a User object.  Similarly, accessing
+=aUser.getItems()= is equivalent to doing a query for all items by that user,
+=SELECT itemid from JOINTABLE where userid = ?1=, followed by a map to convert
+the itemIds into their matching Item objects.
+
+A few more details need to be taken care of: Each object of the Item class now
+has a user field as we just saw.  And when the ListOfItems endpoint is hit, we
+return the JSON representations of a number (zero or more) items to the front
+end.  However, we do not want this user field to contain all the information we
+have on the user: Specifically, we would like to omit the password and the
+email.  However, on a (future) admin view, we would like to see those fields? 
+
+How do we return two different types of JSON from the same object, depending on
+the context it was called in?  Jackson JSON, the JSON generator that is used by
+Spring, has created JsonViews for that.  Views are first declared as interfaces
+on a small class, =JsonViews.java= in our project: 
+
+#+BEGIN_SRC java
+public class JsonViews {
+    interface ItemList {}
+    interface UserDetails extends ItemList {}   }
+#+END_SRC
+
+Now we have two views with a hierarchical relationship, such that =UserDetails=
+also includes all fields that that =ItemList= declares.  Next, we annotate each
+of the data fields to be in one of these two views, as shown above:  Username is
+part of the ItemList view, and the password and email are part of the
+UserDetails view.  
+
+
+** The admin page
+
+To edit, add and remove users, we will need an admin page.  We will not be
+adding the functionality to edit users just yet, but this is also a good place
+to display the list of all items by all users.  This is basically the
+functionality that ListOfItems used to provided, before it changed to only
+return the items of *this* user.
+
+Three endpoints will be implemented in =AdminController.java=: First,
+=/resource/admin/list/=: list all items, regardless of user. Second,
+=/resource/userlist/=: returns a list of all usernames (strings) on the system.   Third,
+=/resource/user/{username}/=: shows full details of the user, including
+password.  Finally, we need to see who is currently logged in and we do this via
+the =/who/= endpoint, which shows name of the currently logged in user.
+
+For full details, please consult the AdminController.java file.  Below is the
+code for one endpoint, the others are very similar:
+#+BEGIN_SRC java
+    @RequestMapping(value = "/resource/admin/userlist/", method = RequestMethod.GET)
+    List<String> userList(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName());
+        if (user != null && user.isAdmin()) {
+            Iterable <User> iterable = userRepository.findAll();
+            List<String> result = new ArrayList<>();
+            iterable.iterator().forEachRemaining((User u) -> {result.add(u.getUsername()); });
+            return result;
+        } else {
+            System.err.println("Unauthorized request to /resource/admin/userlist/ by " + principal.getName());
+            return new ArrayList<String>();
+        }
+    }
+#+END_SRC
+
+We connect this function to an endpoint with =RequestMapping= as usual.  This
+function will return a List of Strings (usernames), and it takes a =Principal=
+as an argument.  When Spring Security is active, any function can have Principal
+as an argument and the value, a Spring object describing the currently logged in
+user, will be filled in automatically.
+
+To work with principal, we usually just do a =getName()=.  In this code, we
+proceed to look up that user in our own =UserRepository=, using an automatically
+created JPA function =findUserByUsername= (the interface for this function is
+defined in the UserRepository; the implementation is provided under the hood).
+Only admin users should be able to see the full list of users, so we check
+whether our user lookup was successful (non-null answer) and whether that user
+has =isAdmin= set.  
+
+In this first pass, we have put some code in =SpringdoApplication.java= to
+create two users, Navya and Dirk, both with password "secret".  Navya is an
+admin user, and Dirk is not.  
+
+If the authorization is successful, we can retrieve all users on the system and
+return a list of their names.  This is done via a =findAll=, a built-in JPA
+function which does what it says on the can.  FindAll returns an iterable, from
+which we derive an iterator.  A lambda function is applied to each item with
+=forEachRemaining=, using a simple Java 8 lambda which takes a user =u= as an
+input and runs the =add= method on our result array.  
+
+If the authorization is not successful, we print an error on the console and
+return an empty list.  Ideally, the front end would check for this with an
+=ng-if= and display some placeholder text ("No users found, are you admin?") in
+case the list is empty.  This has not been implemented in the current version,
+but it should be less than 10 minutes work for you.
+
+*Lesson Learned* If you look at the AdminController.java file, you see that each
+method is wrapped in an if, checking whether the user is authorized to call this
+routine.  This is getting tedious and we will explore a Spring method to do this
+more efficiently later.
+
+*** TODO remove authentication checks
+
+Back on the admin page, we show the list of users on the system.  Each name has a
+details button next to it, and clicking that will show the user details after
+retrieving them from the backend.  This separation between a user list and user
+details is good style:  If the user list is long, only returning a minimal
+amount of information speeds up the page load.  Secondly, sensitive information is only
+sent over the wire when explicitly requested. 
+
+The bottom half of the admin page shows all the todo items, their item IDs and
+the user who owns them.  I have not implemented the ability to click on an item
+here to expand it inline, but you should be able to create this swiftly using my
+code for the user list as an example. 
+
+The admin html page uses two =ng-repeat= statements to loop over users and
+items. It also uses two partials to render the users and items inside the
+loops, consistent with the pattern we used on the main page.  On the javascript
+side, =admin.js= does all the expected contacting of the backend and storing the
+information in variables on the scope.  The only interesting code is the
+=userQuery= array:  This is initialized to ={}= and filled with user details
+when requested via the button press.  The buttons are wired to
+=userDetails(username)= calls (with the username filled in) and the routine will
+contact the backend and populate the =userQuery= map.  On the html side, an
+=ng-if="userQuery[user]"= hides details that have not been retrieved yet: If
+there are no data yet, =userQuery[user]= will return undefined, which is falsy
+and will surpress the html fragment.
+
+
+** Security settings
+
+We have wrapped the endpoints in the AdminController file in authentication
+testing logic.  However, an unauthenticated user should not even be able to
+reach these methods.  The same holds for the endpoints in ListOfItemsController:
+Without a valid login, we should not be able to access these methods.  Spring
+Security provides a convenient method to enforce this: We basically block access
+to all of the site (with some exceptions for static content) unless the users is
+authenticated.  If an unauthenticated request is made, Spring Security will
+redirect to the login page for a smooth user experience.  
+
+To set this up, we need to create a class that extends
+=WebSecurityConfigurerAdapter= and that is annotated with
+=@EnableWebMvcSecurity=.  That class should contains some 'fluent' declarations
+that do precisely what we outlined above:
+
+#+BEGIN_SRC 
+@Configuration
+@EnableWebMvcSecurity
+// only exactly one class should have this annotation, and its method (whose name does
+// not matter, will be executed to obtain the settings
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                    .antMatchers("/js/**").permitAll()
+                    .antMatchers("/css/**").permitAll()
+                    .antMatchers("/fonts/**").permitAll()
+                    .antMatchers("/who").permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                .formLogin()
+                    .loginPage("/credentials.html")
+                    .permitAll()
+                    .and()
+                .logout()
+                    .permitAll()
+                    .and()
+                .csrf().disable()  // not great
+        ;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(inMemoryUserDetailsManager());
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager inMemoryUserDetailsManager () {
+        Properties users = new Properties();
+        return new InMemoryUserDetailsManager(users);
+    }
+
+}
+#+END_SRC
+
+The first =configure= method allows access to pages as outlined, allows everybody to
+access the login and logout pages, and tell Spring that our login can be found
+at =credentials.html=.  Finally, it disables Cross Site Request Forgery
+([[https://en.wikipedia.org/wiki/Cross-site_request_forgery][Wikipedia]]), which is not a good thing to disable but makes our life much easier
+for now.  
+
+The 2nd and 3rd methods set up an in-memory database of users to be used by
+Spring.  We will discuss this database in a minute. 
+
+** Further changes
+
+
+Overview of all changes, please browse through the commit to read all the changes:
+- index.html:  Minor changes to show the currently logged in user and to log
+  out. 
+- index.js: Matching changes to angular.  
+- credentials.html and .js: Login page as discussed above.
+- admin.html:  Page to view all items (regardless of user).  In the future, this
+  page will also allow us to add and remove users. 
+- admin.js:  Matching angular code.
+- AdminController.java:  A new backend for the admin pages. 
+- AdminControlerTest.java:  A test for the backend.
+- Item.java:  Added a user to each todo list item.  Also changed the items so
+  that the user name is included in the JSON for the normal view (itemlist
+  view).   Finally, added a factory method, =Item.empty(User user)=, which will
+  create a new empty item that belongs to the given user. 
+- User.java:  A new entity and class that extends Spring's UserDetails class.
+  It basically just stores the name, password and email of each user, with some
+  added methods to satisfy the UserDetail interface.  
+- JsonViews.java: Creates a new class with two hierarchical interface:
+  =ItemList= (the default view) and =UserDetails= (a more detailed view showing
+  confidential user details).  
+- ListOfItemsController.java: The main endpoint (=/resource/list/=) will now
+  return a list of items owned by the current user.  Nex to that, a few GET
+  requests changed to PUT requests to be more conformant with REST.  Spring
+  Security will work better when creating and deleting items is done via PUT.
+- SpringDoApplication.java: Small changes to include the UserReposity
+  (autowire), to set up the authentication framework and to add two users and
+  five todo items to the database on startup.  The five todo items were there
+  previously, but now they are tied to users. 
+- MvcConfig.java:  Configuration to show login pages with Thymeleaf, no longer
+  used.
+- WebSecurityConfig.java:  Configuration settings as per above.
+ 
+A short note about the factory function in Item.java: This class already has
+several constructors (an empty constructor is required by the JPA and we wrote
+two further constructors in the course of these tutorials).  Why a factory
+function instead of another constructor?  The main advantage here is that we can
+give it a good name instead of having to remember what the constructor with
+1,2,3 or 4 arguments does again.  We use a similar factor method to create
+an AdminUser in =User.java=, check it out. 
+ 
+At this point, we have a working login system:  The user can log in and we have two
+users (hardcoded into the application for now).  Stories belong to a user
+internally and only the stories owned by a user are visible to that user.  
+#+BEGIN_commit
+ [[github:88e32599497bb00b6789c24e232f211352706291]]
+#+END_commit
+
+
+
+
+
+*** TODO figure out testing
+
+Building tests to work with this is not as easy as it should be:  The latest
+Spring security version (4.0.3 at the time of writing) has support for mocking logged in users, but spring-boot
+pulls in a much older version (3.2.8).  You can check this by opening the Maven
+project tab in IntelliJ and clicking on the =spring-security=.  It is also shown
+in the first screenshot above, on line 66, you can see security core being
+included at version 3.2.8.  I tried overriding Spring Boot's defaults and
+manually pulled in the latest Spring Security version, but this lead to version
+inconsistency errors.   
+  
+This means that the endpoints in AdminController.java are not tested currently
+and that the test for the updated 'create' method in ListOfItemsController will
+fail because there is no currently logged in user.  
+
+
+
+
 
 
 
@@ -289,15 +637,9 @@ MERGE
   working, csrf disabled for now
 - same for admin.html
 
-*Aside* on cookies and browser state: When working with authentication, you will
-sometimes run into weird errors.  My favorite was an AngularJS message in the
-console showing that an AngularJS assertion (=areq=) had failed.  If this
-happens to you, often the solution is as simple as opening a fresh anonymous
-browser window to make sure you do not have any tokens and cookies floating
-around.
 
-
-
+*Aside* on hot reloading:  Starting and stopping Spring servers is no fun.  I am
+not sure if the Spring was intended 
 
 *  STUFF TO ADD
 
@@ -311,6 +653,13 @@ html login form, browser version
 [[http://2.bp.blogspot.com/-Ruiw7iRup8c/ViU0WjDtm_I/AAAAAAAAQ08/1-h5VZKIm6c/s320/Screen%2BShot%2B2015-10-19%2Bat%2B11.18.59%2BAM.png]]
 
 
+** TODO set intellij to not use .idea directory but eclipse compatible settings.
+
+** TODO maybe we can use the userrepo by implementing the UserDetailsManager, as inMemoryUserMgr, can do.
+
+** TODO discuss that any user can delete items, only frontend prevents this 
+
+  
 
 * Resources
 
