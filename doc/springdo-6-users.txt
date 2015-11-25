@@ -166,7 +166,7 @@ We used the dependency 'spring-boot-starter-security'.  The 'starter' packages
 are convenient high-level dependencies supplied by Spring Boot: Instead of
 having to include a number of things, you just include the starter which will
 pull in the packages you would normally need for this task.  In IntelliJ, you
-can inspect the file =springdo.iml= to see how IntelliJ has integrated.  Here, I
+can inspect the file =springdo.iml= to see how IntelliJ has interpreted this.  Here, I
 went to the 'version control' tab to do a diff on that file, showing that next
 to 'spring-boot-starter-security', nine other packages were pulled in:
 
@@ -498,7 +498,7 @@ redirect to the login page for a smooth user experience.
 
 To set this up, we need to create a class that extends
 =WebSecurityConfigurerAdapter= and that is annotated with
-=@EnableWebMvcSecurity=.  That class should contains some 'fluent' declarations
+=@EnableWebMvcSecurity= (for Spring Boot 1.2.5 and earlier only, see below).  That class should contains some 'fluent' declarations
 that do precisely what we outlined above:
 
 #+BEGIN_SRC 
@@ -586,7 +586,7 @@ Overview of all changes, please browse through the commit to read all the change
   used.
 - WebSecurityConfig.java:  Configuration settings as per above.
  
-A short note about the factory function in Item.java: This class already has
+A short note about the =Empty= factory function in Item.java: This class already has
 several constructors (an empty constructor is required by the JPA and we wrote
 two further constructors in the course of these tutorials).  Why a factory
 function instead of another constructor?  The main advantage here is that we can
@@ -605,20 +605,126 @@ internally and only the stories owned by a user are visible to that user.
 
 
 
-*** TODO figure out testing
+** Upgrading Spring Boot to run tests 
 
-Building tests to work with this is not as easy as it should be:  The latest
-Spring security version (4.0.3 at the time of writing) has support for mocking logged in users, but spring-boot
+Building tests to work with this secured site is not as easy as it should be:  The latest
+Spring security version (4.0.3 at the time of writing) has support for mocking
+logged in users, but current spring-boot
 pulls in a much older version (3.2.8).  You can check this by opening the Maven
 project tab in IntelliJ and clicking on the =spring-security=.  It is also shown
 in the first screenshot above, on line 66, you can see security core being
 included at version 3.2.8.  I tried overriding Spring Boot's defaults and
 manually pulled in the latest Spring Security version, but this lead to version
-inconsistency errors.   
-  
-This means that the endpoints in AdminController.java are not tested currently
-and that the test for the updated 'create' method in ListOfItemsController will
-fail because there is no currently logged in user.  
+inconsistency errors.  
+
+Luckily, a new version of Spring Boot (1.3.0) was
+released while I was writing this, and upgrading is as simple as changing the
+version number in the =pom.xml= file and refreshing Maven (see directions above):
+#+BEGIN_SRC 
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.3.0.RELEASE</version>
+#+END_SRC
+If you look at the =springdo.iml= file, you can see that Spring uses different
+version numbering schemes for each of its components:  Spring Boot 1.3.0 pulls
+in the Spring Framework 4.2.3, Spring Data JPA 1.9.1 and Spring Security 4.0.3,
+among others.  
+
+*Lesson Learned*:  Keep this in mind when looking at the documentation for Spring
+components:  Consult the =iml= file or otherwise determine the exact version
+number used before you hit the internet.   I wasted a good amount of time trying to make Spring
+Security 4.0 features work in the Spring Security 3.2 setting, because I didn't
+realize Spring Security has a different versioning system from Spring
+Framework (which was at 4.x already).  
+
+
+The migration does not come for free:  We use a =@EnableWebMcvSecurity=
+annotation in our =WebSecurityConfig.java= class, but this annotation is now
+deprecated and replaced by =@EnableWebMcvSecurity=:
+#+BEGIN_SRC java
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+#+END_SRC
+There are many other migration concerns (see resources section below), but none
+of those affect us directly.  Our previous commit had the security section
+excluded from the autoconfiguration, because this was necessary for that
+version.  Now this line of code has to be removed or Spring will not start up
+(this is not mentioned in any of the migration documents, as far as I can
+tell).  In =SpringdoApplication.java=, remove the line that reads:
+: @EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
+
+
+
+
+** Writing tests
+
+In a real world application, we should write tests before we write the
+implementation but this would make this tutorial harder to read.  Also note that
+we are still not testing any frontend functionality:  We will do all of that in
+a later episode of this tutorial.
+
+As it is, we do not have any tests for the new admin endpoints, so these need to
+be written.  We do not have any logic in our other java files (which contain
+repositories, entities, and such) so there is nothing to test there.  But before we
+write the new tests, let's run the old ones:  Our one functional test is
+ListOfItemsControllerTest, and it currently has one failing test:
+'whenCreateIsHitANewItemIsCreatedAndReturned' fails with the following
+(compressed) logs:
+
+#+BEGIN_SRC text
+Unauthorized request to /resource/create/ by null
+...
+java.lang.IllegalArgumentException: root can not be null
+#+END_SRC
+
+The problem  here is that the routine to create a new todo item now requires a
+user. In the test, we are not logged in as a user and we therefore get an error
+on the terminal and a null object is returned, leading to the subsequent
+exception.  
+
+Spring Security has a new annotation =@WithMockUser= that should give us an easy
+way to mock a standard user (username 'user', password 'password') in this
+situation.  However, this does not seem to work in our situation:  Our create
+method retrieves a =Principal= argument from Spring, as shown below, but for the
+=@WithMockUser= this field does not get populated (a bug, maybe?).  
+
+#+BEGIN_SRC java
+    @RequestMapping(value="/resource/create/", method=RequestMethod.POST)
+    Item postCreate(Principal principal) {
+        if (principal != null) {
+#+END_SRC 
+
+The =@WithMockUser= works if we do not ask Spring to supply the Principal but
+fetch it ourselves with:
+: principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
+
+RAW RAW RAW
+
+@WithMockUser is fine but doesn't work on the magic (Principal) argument, even
+though it does set it.  see thisl
+#+BEGIN_SRC java 
+    @JsonView(JsonViews.ItemList.class)
+    @RequestMapping(value="/resource/create/", method=RequestMethod.POST)
+    Item postCreate(Principal principal) {
+        if (principal != null) {
+            User user = userRepository.findByUsername(principal.getName());
+            if (user != null) {
+                Item item = itemRepository.save(Item.empty(user));
+                return item;
+            }
+        }
+        Principal newprince = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.err.println("Unauthorized request to /resource/create/ by " + principal + " despite " + newprince);
+        return null;
+    }
+
+#+END_SRC
+
+/RAW
 
 
 
@@ -629,8 +735,8 @@ fail because there is no currently logged in user.
 
 DIRK:
 - can we make the standard security work with the post??
-- can we just use the thymeleaf security stuff??
-
+- XX can we just use the thymeleaf security stuff??
+- BUG new item's title doesn't persist. 
 
 MERGE
 - admincontroller merge on delete, error: could not apply a058d9e... Login
@@ -638,8 +744,11 @@ MERGE
 - same for admin.html
 
 
-*Aside* on hot reloading:  Starting and stopping Spring servers is no fun.  I am
-not sure if the Spring was intended 
+*Aside* on hot reloading:  Starting and stopping Spring servers is no fun.  Try
+IntelliJ Command-F9, Command-F10 to hot reload the front end code.   
+
+from http://kielczewski.eu/2014/12/spring-boot-security-application/
+The logout URL is /logout, permitted for all. After that, the user will be redirected to /. One important remark here is that if the CSRF protection is turned on, the request to /logout should be POST.
 
 *  STUFF TO ADD
 
@@ -663,7 +772,27 @@ html login form, browser version
 
 * Resources
 
-This is a very long post (actually seven posts combined into one tutorial;
+
+A well-written blog post with a similar demonstration by http://kielczewski.eu/2014/12/spring-boot-security-application/][Bartosz Kielczewski]]
+
+Testing with CSRF protection on requires some extra work, see
+http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#test-mockmvc-csrf
+
+
+There are differences between Spring Boot 1.2 and 1.3.  These are apparently not
+included in the normal documentation but listed separately on a [[https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.3-Release-Notes][Github wiki page]].
+
+Spring Security 4.x is a big upgrade over the 3.x series.  However, this means
+the updates and migrations are not trivial either.  This [[http://docs.spring.io/spring-security/site/migrate/current/3-to-4/html5/migrate-3-to-4-jc.html#m3to4-role-prefixing][migration guide]] is very
+long but contains some good information.  They provide a sample project which
+gets upgraded from 3.x to 4.x, here is [[https://github.com/spring-projects/spring-security-migrate-3-to-4/compare/jc?expand=1][the diff between them]] (several hundred lines).
+
+
+In an excellent answer to this [[http://stackoverflow.com/questions/28123299/spring-boot-module-based-integration-testing/28141143#28141143][SO question]], Sam Brannen discusses various strategies for
+testing under Spring and Spring Boot and how you can disable security while
+testing. 
+
+I can recommend this very long post (actually seven posts combined into one tutorial;
 reading the Github =Readme.adoc= files may be easier) that
 deals with all kinds of aspects of Spring, AngularJS and security.  Part 2
 (subdirectory 'Single' in the github repo) helped me write the code for this
@@ -672,10 +801,6 @@ having security and content on different servers and using OAuth.  It is highly
 recommended reading if you want to dive much deeper into that area.
 https://spring.io/guides/tutorials/spring-security-and-angular-js/
 and https://github.com/dsyer/spring-security-angular/blob/master/overview.adoc.
-
-
-Testing with CSRF protection on requires some extra work, see
-http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#test-mockmvc-csrf
 
 
 

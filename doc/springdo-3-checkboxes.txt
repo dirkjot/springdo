@@ -88,7 +88,7 @@ then declare =List<Map<String, StringOrBool>> result=.
 Because we were just trying something out, we made the quick decision to use
 string values 'yes' and 'no'.  Then we built tests, more functions, and before
 we knew, it would be fair amount of refactoring to get rid of these strings and
-go back to booleans.  We will do this later but leave these strings here for
+go back to booleans.  We aim to do this later but leave these strings here for
 now.  
 
 Another good point is that there is no need for a map here.  An object 'item'

@@ -128,6 +128,7 @@ with all things Spring).
 So go to [[http://start.spring.io]] and type in some details for your project
 - Give your project a nice name, we use Springdo.  Enter this name under 'name'
   and 'artifact' (the name of the jar you will be making)
+- We chose Spring Boot version 1.2.6
 - Use a reverse domain name, like 'org.demo' or 'io.pivotal'. Enter this under
   'group' and 'package name' (confusing terminology there).
 - Choose a 'maven project' as the 'type'
@@ -232,6 +233,8 @@ public class ListOfItemsController {
 
 If you refresh your browser you should now see an empty todo list.
 Congratulations!  User story finished. 
+
+*Github* All the code is on [[https://github.com/dirkjot/springdo][Github]], see next installment for more details.
 
 * Thanks!
 
