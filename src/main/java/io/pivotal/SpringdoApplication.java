@@ -4,12 +4,9 @@ package io.pivotal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-@EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
 @SpringBootApplication
 public class SpringdoApplication implements CommandLineRunner {
 

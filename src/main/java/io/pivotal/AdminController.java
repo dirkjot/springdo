@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -91,16 +92,18 @@ public class AdminController {
      */
     @RequestMapping(value="/who/")
     String whoIsLoggedIn(Principal principal) throws JsonProcessingException {
-        String name = principal.getName();
-        // angular only wants json hashes as input, we can create one by hand or use the jackson json
-        // library which is already a dependency of spring boot
-        ObjectMapper tojson = new ObjectMapper();
-        Map<String, String> map = new HashMap<>();
-        map.put("name", name);
-        name = tojson.writeValueAsString(map);
-        // we could also just return the name , but do not forget to quote it!
-        // we like to return hashes so we can expand the api at a later time
-        //    name = "\"" + name + "\"";
+        String name = "";
+        if (principal != null) {
+            name = principal.getName();
+            // angular only wants json hashes as input, we can create one by hand or use the jackson json
+            // library which is already a dependency of spring boot
+            ObjectMapper tojson = new ObjectMapper();
+            Map<String, String> map = new HashMap<>();
+            map.put("name", name);
+            name = tojson.writeValueAsString(map);
+        } else {
+            name = "{\"name\":\"\"}";
+        }
         return name;
     }
 }

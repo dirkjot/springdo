@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,7 +48,9 @@ public class ListOfItemsControllerTest {
     @Before
     public void setUp() throws Exception {
         /* do not use standAloneSetup, as it is not good for web apps */
-        mvc = MockMvcBuilders.webAppContextSetup(context).build();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
     }
 
     @Test
@@ -102,6 +106,7 @@ public class ListOfItemsControllerTest {
         assertEquals(newItem.content, item.content);
     }
 
+    @WithMockUser("Navya")
     @Test
     public void whenCreateIsHitANewItemIsCreatedAndReturned() throws Exception {
         mvc.perform(post("/resource/create/"))

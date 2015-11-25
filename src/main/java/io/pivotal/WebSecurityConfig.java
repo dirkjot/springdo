@@ -8,14 +8,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import java.util.Properties;
 
 @Configuration
-@EnableWebMvcSecurity
+@EnableWebSecurity
 // only exactly one class should have this annotation, and its method (whose name does
 // not matter, will be executed to obtain the settings
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -26,7 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/js/**").permitAll()
                     .antMatchers("/css/**").permitAll()
                     .antMatchers("/fonts/**").permitAll()
-                    .antMatchers("/who").permitAll()
+                    .antMatchers("/who/").permitAll()
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()
