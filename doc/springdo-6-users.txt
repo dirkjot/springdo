@@ -658,12 +658,14 @@ tell).  In =SpringdoApplication.java=, remove the line that reads:
 
 
 
-** Writing tests
+** Setting up and writing tests
 
 In a real world application, we should write tests before we write the
 implementation but this would make this tutorial harder to read.  Also note that
 we are still not testing any frontend functionality:  We will do all of that in
-a later episode of this tutorial.
+a later episode of this tutorial.  Because we have no tool to test the front
+end, we cannot do end-to-end testing either, which is really starting to become
+a bit of an issue.  But again, more on that later. 
 
 As it is, we do not have any tests for the new admin endpoints, so these need to
 be written.  We do not have any logic in our other java files (which contain
@@ -679,56 +681,237 @@ Unauthorized request to /resource/create/ by null
 java.lang.IllegalArgumentException: root can not be null
 #+END_SRC
 
-The problem  here is that the routine to create a new todo item now requires a
-user. In the test, we are not logged in as a user and we therefore get an error
-on the terminal and a null object is returned, leading to the subsequent
-exception.  
-
-Spring Security has a new annotation =@WithMockUser= that should give us an easy
-way to mock a standard user (username 'user', password 'password') in this
-situation.  However, this does not seem to work in our situation:  Our create
-method retrieves a =Principal= argument from Spring, as shown below, but for the
-=@WithMockUser= this field does not get populated (a bug, maybe?).  
+The problem here is that the routine to create a new todo item (code shown
+below) requires a user.  In the production version, Spring will pass in a user
+(called a Principal in Spring security parlance) automatically and it will be
+picked up by our method argument =principal=.  So if you test this by hand on
+the server, the code works.  However, in the test, we are not logged in as a user and we
+therefore get an error on the terminal and a null object is passed into =principal=, leading to
+the subsequent NullPointer exception because we cannot do a =getName= on null:
 
 #+BEGIN_SRC java
     @RequestMapping(value="/resource/create/", method=RequestMethod.POST)
     Item postCreate(Principal principal) {
-        if (principal != null) {
-#+END_SRC 
+        User user = userRepository.findByUsername(principal.getName());
+#+END_SRC  
 
-The =@WithMockUser= works if we do not ask Spring to supply the Principal but
-fetch it ourselves with:
-: principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+The reason we upgraded to the new version is that Spring Security has a new
+annotation in version 4.x: =@WithMockUser=.  This should give us an easy way to
+mock a standard user (username 'user', password 'password') for this situation.
+We can optionally supply a username, which is what we do here. 
+However, adding this to the test code still does not work, the =principal=
+argument does not get populated in the test (a bug, maybe?).  Here is the first
+part of the test code:
 
-
-
-RAW RAW RAW
-
-@WithMockUser is fine but doesn't work on the magic (Principal) argument, even
-though it does set it.  see thisl
-#+BEGIN_SRC java 
-    @JsonView(JsonViews.ItemList.class)
-    @RequestMapping(value="/resource/create/", method=RequestMethod.POST)
-    Item postCreate(Principal principal) {
-        if (principal != null) {
-            User user = userRepository.findByUsername(principal.getName());
-            if (user != null) {
-                Item item = itemRepository.save(Item.empty(user));
-                return item;
-            }
-        }
-        Principal newprince = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.err.println("Unauthorized request to /resource/create/ by " + principal + " despite " + newprince);
-        return null;
-    }
-
+#+BEGIN_SRC java
+    @WithMockUser("Navya")
+    @Test
+    public void whenCreateIsHitANewItemIsCreatedAndReturned() throws Exception {
+        mvc.perform(post("/resource/create/"))
+                .andExpect(status().isOk())
 #+END_SRC
 
-/RAW
+This test currently fails again with a NullPointer exception.  I debugged the
+test by putting a breakpoint on the first line of the end point handler
+=postCreate= and we again have a null value for =principal=.  To validate that
+this is a valid login problem, I temporarily allowed access to the
+=/resource/**= path in the =WebSecurityConfig.java= and then accessed the create
+endpoint (=/resource/create/=) with the excellent [[http://www.getpostman.com/][Postman]] tool, without loggin
+into the site first: The result is the same NullPointer exception, but this time
+it is expected/valid as this endpoint should not be accessed without being
+authenticated.  (You can have an interesting Friday afternoon discussion on whether the app should
+handle this error, or a NullPointer is good enough for something that is not
+supposed to happen.  I suggest doing this over cheese and wine so it is
+enjoyable, because IMHO there is no right answer to this question.)
+
+As [[http://www.mkyong.com/spring-security/get-current-logged-in-username-in-spring-security/][the docs]] point
+out, another way to access the currently logged in user is to access the
+global =SecurityContextHolder= with a call like:
+: principal = SecurityContextHolder.getContext().getAuthentication();
+This is not particularly pretty and it is, as we just saw, it is only necessary
+for tests.  I 'solved' it by creating a helper function and calling it on the
+first line of all =Test= functions that involve principal:
+
+#+BEGIN_SRC java    
+    public Principal fixPrincipalForTest(Principal principal) {
+        if (principal == null) {
+            principal = SecurityContextHolder.getContext().getAuthentication();
+            if (principal == null) {
+                System.err.println("Unauthorized request, principal is null");
+            }
+        }
+        return principal;
+    }
+#+END_SRC
+
+If you debug this code, you can see that the =principal= object has inner
+=principal= data, which actually holds the username and password.  Apparently
+this is how Spring has chosen to organize its principal data structure, but it
+is at least slightly confusing:  Running =principal.getPrincipal()= will not return a
+Principal object, but a UserDetails.User object.  Keep this in mind if IntelliJ
+tells you that you are dealing with incompatible types.  We will encounter that
+'User' datatype again below. 
+
+** AdminControllerTest
+
+With that we can finally write the code for the new Admin endpoints.  We can use
+the handy IntelliJ =Navigate: Test Subject= method for navigating to the matching test file: If the test
+file does not exist, it will prompt you to generate the test file.  A popup will
+show you the four functions in this file ask for which ones to create tests: I
+checked all of them.  Next, I copied the test setup from
+ListOfItemsControllerTest and started modifying the provided empty tests.
+Instead of one test per function, we prefer more 'behavior based' tests that
+tell a user story and its outcome.
+
+Here is a the first two, which test the outcome of the =admin/list= endpoint:
+Recall that this endpoint returns all items in the database for the admin users,
+but only the users own items for non-admin.
+
+#+BEGIN_SRC java
+    @WithMockUser("Navya")
+    @Test
+    public void AdminList_returnsAListOfAllItemsForAdmin() throws Exception {
+        mvc.perform(get("/resource/admin/list/"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(5)))
+                .andExpect(jsonPath("$[0].title", containsString("swim")))  // owned by Navya
+                .andExpect(jsonPath("$[4].title", containsString("sleep")));  // owned by Dirk
+    }
+
+    @WithMockUser("Dirk")
+    @Test
+    public void AdminList_returnsAListOfOwnItemsForUser() throws Exception {
+        mvc.perform(get("/resource/admin/list/"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[1].title", containsString("sleep")));
+    }
+#+END_SRC
+
+Neither of these tests work until we put the `fixPrincipalForTest` in the
+corresponding endpoint.  We could have copied the helper function into the
+=AdminController= file, but this is not ideal as we would have created
+duplicated code.  Instead, we added the function as a static member function to
+a dedicated =Helper= class, which could also hold future small helper
+functions.  We will update the ListOfItemsController file at a later stage. 
+*** TODO update the ListOfItemsController file at a later stage. 
+
+The tests assume the setup created in 'SpringdoApplication.java': 2 users with
+5 items between them.  We could make more robust tests here by actually
+asserting that items belong to more than one user etc, but this is the simplest
+thing that works.   For the user test, I quickly researched whether we could
+write a simple jsonPath to assert no item is owned by Navya, but because our
+json is an array with maps inside it, jsonPath's quite expressive syntax does
+not work here.
+
+*Lesson Learned*:  Although an array as the outer element is perfectly valid
+JSON, many tools expect a map as the outer element with named inner elements, or
+a 'data' key to hold the array.  
+
+While testing the =/who/= endpoint (which is not under the protected
+=/resource/= tree, ie. accessible by anybody), I discovered that although the
+intention was that =/who/= would show who, *if anybody* was logged in, it did
+not really deal with the case of not being logged in.  Nice catch, and another
+good reason to write the tests first next time. 
+
+#+BEGIN_commit
+ [[github:547750f148746c68c5ee7dedfd3f12f97f927018]]
+#+END_commit
 
 
 
+** Improving the user database
 
+There is one issue about this setup that is particularly not satisfactory to me:
+We have a UserRepository, but the Spring Security framework is not using it to
+authenticate the users.  Instead, Spring has its own in-memory database of users
+and at startup, we copy all users from our repository into the Spring's
+database.  This is not only duplication of data, but it will also become quite
+hard to manage once we add the ability to edit, add or remove users.  
+
+The underlying issue here is that Spring's concept of users more or less
+hardcoded into the framework.  Spring provides an interface =UserDetails= which
+has specifies all the things you would expect: Name, password, enabled and a
+bunch of other reasons why a user may be considered inactive, and finally a list
+of GrantedAuthority to signify which roles the user has in the system.  Our
+=User= class extends the =UserDetails= class, but Spring Security wants to talk
+to a =UserDetailsManager= class.  
+
+There are two major ways forward:  Create an extra layer
+of indirection to the system, which will wrap around our UserRepository and
+supply the methods Spring expects from a UserDetailsManager.  Alternatively, we
+can have a two-layer User representation, with an inner User that is a
+=org.springframework.security.core.userdetails.UserDetails= type, an contains
+all the administrative fields like =isCredentialsNonExpired=.  This option is
+well discussed in this [[http://kielczewski.eu/2014/12/spring-boot-security-application/][blog]].   We stay on our course and follow the first
+option, as our User class already has the necessary security 'cruft'.
+Personally, I would argue that it is good style to keep all the user data in one
+place, even if that means that we need to store some variables that we are
+pretty unlikely to ever use (and have ugly names to boot).  Regrettably, Spring
+Security requires these and, to me, the easiest way forward it to implement
+them.
+
+First, we create a new class the =UserManager=, which builds on top of the
+UserRepository:
+
+#+BEGIN_SRC java
+@Component
+public class UserManager implements UserDetailsManager {
+    @Autowired
+    UserRepository userRepository;
+
+    public void createUser(UserDetails user){
+        userRepository.save((io.pivotal.User) user);
+    }
+    // ... code deleted
+#+END_SRC
+
+Because our user class implements =UserDetails=, we can pass our users into
+these functions, which are required to have =UserDetail= parameters by the
+interface.  However, the repository does not know how to handle =UserDetails= so
+we have to cast them back to the =User= class they are.   I have used the full
+path on =User= in this code to disambiguate the many versions of the User class
+here. 
+
+In the setup of the security component (WebSecurityConfig), we need to initialize our new
+UserManager.  This setup is not particularly pretty, but apparently it is what
+Spring requires and it gives us the flexibility to specify the UserManager at
+runtime.  We can use this later on to only start up with our 2 users and 5
+stories for tests, and use an empty database for production use. 
+
+#+BEGIN_SRC java
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(myUserManager());
+    }
+
+    @Bean
+    public UserManager myUserManager () {
+        return new UserManager();
+    }
+#+END_SRC
+
+One final change is on the frontend, of all places: We have so far pre-filled
+the username field with "navya" (lowercase), which was apparently enough to
+satisfy the inMemoryUserDetailsManager, but our new login system does not
+convert case so we have to change it to "Navya".  Similarly, use "Dirk" to
+login as the second user.
+
+
+With that, we have a very long story finished.  Creating a secure app is not
+even that hard, it just requires a lot of background reading and understanding
+of how Spring Security works.   We have not implemented some straightforward
+things like adding, editing and removing users, but this is quite similar to the
+same operations on todo items.  It does make for some great practice to
+implement this.
+
+A related issue is that anybody can delete items at the moment, all they have to
+do is to log in and then hit the delete endpoint with the todo item id.  A
+better implementation would only allow the owner of the item to delete it.
+
+
+commit:5f8549588f04fc435e40c684e66848248175fe7a
 
 
 
@@ -768,7 +951,9 @@ html login form, browser version
 
 ** TODO discuss that any user can delete items, only frontend prevents this 
 
-  
+** TODO create test and run configs
+http://www.mkyong.com/spring/spring-embedded-database-examples/
+http://stackoverflow.com/questions/29410009/spring-junit-datasource-autowiring
 
 * Resources
 
@@ -802,11 +987,13 @@ recommended reading if you want to dive much deeper into that area.
 https://spring.io/guides/tutorials/spring-security-and-angular-js/
 and https://github.com/dsyer/spring-security-angular/blob/master/overview.adoc.
 
-
+Full [[https://github.com/jayway/JsonPath][docs]], syntax and online test pages for the excellent JsonPath library (JayWay
+version). 
 
 * Thanks
 
-A big thanks to everyone who read and commented on this tutorial, to
+A big thanks to everyone who read and commented on this tutorial (Ehren Murdick;
+Michael Oleske), to
 Pivotal Labs for letting me write these tutorials, and  to Navyasri
 Canumalla, who sat down with me to learn Spring and wrote half the
 code you see here. 
