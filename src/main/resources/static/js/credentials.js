@@ -7,7 +7,7 @@ angular.module('credentials', ['ngRoute'])
 
     .controller('credentials', function($scope, $http, $window) {
 
-        $scope.username = "navya";
+        $scope.username = "Navya";
         $scope.password = "secret";
         $scope.reminder = false;
 

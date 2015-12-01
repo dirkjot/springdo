@@ -17,8 +17,8 @@ public class SpringdoApplication implements CommandLineRunner {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    InMemoryUserDetailsManager inMemoryUserDetailsManager;
+//    @Autowired
+//    InMemoryUserDetailsManager inMemoryUserDetailsManager;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringdoApplication.class, args);
@@ -37,7 +37,7 @@ public class SpringdoApplication implements CommandLineRunner {
         itemRepository.save(new Item("drive", "to great viewpoint", secondUser));
         itemRepository.save(new Item("sleep", "at least 8 hours", secondUser));
 
-        userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
+//        userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
         // example of how you would change an existing user, this will throw Illegal State Exception if the username does not exist
         //inMemoryUserDetailsManager.updateUser(new User("t", "tt", "xx"));
 

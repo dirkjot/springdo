@@ -73,6 +73,14 @@ public class User implements org.springframework.security.core.userdetails.UserD
     }
 
     /**
+     * Sets the password used to authenticate the user.
+     *
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
      * Returns the username used to authenticate the user. Cannot return <code>null</code>.
      *
      * @return the username (never <code>null</code>)

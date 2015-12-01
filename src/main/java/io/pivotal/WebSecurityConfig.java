@@ -10,9 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import java.util.Properties;
 
 @Configuration
 @EnableWebSecurity
@@ -42,14 +40,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(inMemoryUserDetailsManager());
+        auth.userDetailsService(myUserManager());
     }
 
     @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsManager () {
-        Properties users = new Properties();
-        return new InMemoryUserDetailsManager(users);
+    public UserManager myUserManager () {
+        return new UserManager();
     }
-
 }
 
