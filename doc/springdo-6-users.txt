@@ -647,6 +647,7 @@ deprecated and replaced by =@EnableWebMcvSecurity=:
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 #+END_SRC
+
 There are many other migration concerns (see resources section below), but none
 of those affect us directly.  Our previous commit had the security section
 excluded from the autoconfiguration, because this was necessary for that
@@ -700,9 +701,11 @@ annotation in version 4.x: =@WithMockUser=.  This should give us an easy way to
 mock a standard user (username 'user', password 'password') for this situation.
 We can optionally supply a username, which is what we do here. 
 However, adding this to the test code still does not work, the =principal=
-argument does not get populated in the test (a bug, maybe?).  Here is the first
-part of the test code:
+argument does not get populated in the test.  We will see below how to fix this
+the right way, here let's first step over a quick fix.
 
+Here is the first
+part of the test code:
 #+BEGIN_SRC java
     @WithMockUser("Navya")
     @Test
@@ -751,6 +754,44 @@ is at least slightly confusing:  Running =principal.getPrincipal()= will not ret
 Principal object, but a UserDetails.User object.  Keep this in mind if IntelliJ
 tells you that you are dealing with incompatible types.  We will encounter that
 'User' datatype again below. 
+
+This works and I actually have left it in the code of ListOfItemsController,
+even though it creates a (minimal) amount of overhead in the runtime.  For
+AdminController, it is worth exploring a better way as there are four endpoints
+that all need this treatment.  More importantly, in AdminControllerTest, all
+tests require authentication of some type.  
+
+On the Spring-Security channel of Slack, Rob Winch pointed me to the very
+obvious solution for this problem with principal:  We need to tell the =MockMvc=
+that we use for testing to use the security framework.  In AdminControllerTest,
+you will find the following code:
+#+BEGIN_SRC java
+    @Before
+    public void setUp() throws Exception {
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
+#+END_SRC
+
+The =apply(..)= line make the MockMvc use Spring Security.  The =@WithMockUser=
+annotations will work as advertised and the principal argument will be set in
+the tests.  A drawback of kinds is that all interactions with the Mvc now use
+security, which means that we cannot access any endpoints under =/resource/=
+without logging in.  For this reason, I stuck with the unsecured MockMvc and the
+fixPrincipalForTest hack in the ListOfItemsController.
+
+Once security is working in the MockMvc, Spring provides some goodies to test,
+for example, whether an unauthorized request indeed returns the correct response
+from the webserver.  You can see this in action in this test:
+#+BEGIN_SRC java
+    @Test
+    public void AdminShowUser_failsWithoutAuthentication() throws Exception {
+        mvc.perform(get("/resource/user/Navya/"))
+                .andExpect(unauthenticated());
+    }
+#+END_SRC
 
 ** AdminControllerTest
 
