@@ -77,15 +77,15 @@ and of course
 
 * Spring Components
 
-The nice part of Spring is that there are many, many components to it and that a
-commonly encountered problem, like authentication, is probably already provided
-by Spring somewhere.  The Spring site https://spring.io/projects is dedicated to
+The nice part of Spring is that there are many, many components to it.  If you
+have a problem that is more or less commonplace, like authentication, there
+probably is a solution for it somewhere in the larger Spring framework.  The Spring site https://spring.io/projects is dedicated to
 the projects and you can see which projects are available and what they do (in
 its current form (Fall 2015), the site fails to live up on its promises a bit:
-Sub projects are not visible and it is low on actual information what the
+Subprojects are not directly visible and it is low on actual information what the
 projects do, but this will surely be improved upon soon). 
 
-Luckily, a few [[http://docs.spring.io/spring-security/site/docs/current/guides/html5/][clicks]] later, you will find the usual '5 minute' introduction to
+Luckily, Spring Security is there and a few [[http://docs.spring.io/spring-security/site/docs/current/guides/html5/][clicks]] later, you will find the usual '5 minute' introduction to
 Spring Authorization and you can find more info on Spring Security in general.
 Note that this introduction is not necessary for this tutorial and it also was
 build with normal Spring in mind, not Spring Boot, but it makes for good reading
@@ -96,11 +96,13 @@ regardless.  Much of what follows below is based on it.
 
 To add a new part of Spring to our project we have to first tell our build tool
 (Maven) about the new dependency and then have it download the necessary files.
-To do so, double click the =pom.xml= file on the top level of the project.  In
-IntelliJ, you can right click anywhere in the file and choose 'Generate', then
-'Managed Dependency'.  IntelliJ will show a scrollable list of all available
-dependencies, from which you should choose 'spring-boot-starter-security'.  This
-should generate a new dependency in your =pom.xml=, like so:
+To do so, double click the =pom.xml= file on the top level of the project. 
+
+In IntelliJ, you can right click anywhere in the file and choose 'Generate',
+then 'Managed Dependency'.  IntelliJ will show a scrollable list of all
+available dependencies, from which you should choose
+'spring-boot-starter-security'.  This should generate a new dependency in your
+=pom.xml=, like so:
 
 #+BEGIN_SRC xml
                 <dependency>
@@ -154,9 +156,7 @@ giving you attractive buttons to click on.  Gradle has the distinct advantage
 that its configuration file =build.gradle= is precisely 100 times more readable
 than Maven's =pom.xml= and there are a few other [[http://www.drdobbs.com/jvm/why-build-your-java-projects-with-gradle/240168608][advantages]] too.  However,
 almost all of the Spring (Boot) docs are made with Maven in mind, so we stuck to
-that convention here.
-
-# TODO : add gradle section later on
+that convention here.  
 
 
 
@@ -187,6 +187,24 @@ those here as they depend on Thymeleaf, a template engine which can help you
 serve pages from the server directly.  Because we use Angular for the front end,
 our back end only outputs 'information', in the form of JSON packets, and never
 actual pages.  
+
+This reflects a change in style that has happened over the last few years:  It
+used to be the case that frontend systems were minimal or non-existent, the
+server would simply produce a page which the browser would display as-is. Servers used
+technology like [[https://en.wikipedia.org/wiki/JavaServer_Pages][JSP]] or [[http://www.thymeleaf.org/][Thymeleaf]] to take a page template and populate it with
+user specific information ("Welcome User4829!  You have 0 new messages").  Every
+click or input action made by the user would be sent back to the server and
+would produce a new page.  
+
+This system is still useful for static pages, but front end systems like
+Angular (and it predecessors [[http://backbonejs.org/][Backbone]], [[http://foundation.zurb.com/][Foundation]] and others) have now taken
+over the role of interacting with the user.  The obvious benefit is speed of
+interaction:   A click can be handled by javascript much faster by cutting out
+two network trips and replacing a busy server with a dedicated and lean
+javascript engine in the user's browser.  This is even more true on mobile
+devices using a cellular data connection:  When I turn my phone sideways, I want
+an instantaneous animation from portrait to landscape which would be impossible
+to do from the server side over a relatively slow link. 
 
 
 * Making login work
@@ -305,8 +323,7 @@ backend.
 
 First of all, we need to create a database of users.  To this end, we create a
 User class, which is also a JPA Entity.  To later interface with the Spring
-Security framework, we inherit from =UserDetails=
-(org.springframework.security.core.userdetails.UserDetails), an interface which
+Security framework, we inherit from =UserDetails=, a Spring Security Core interface which
 requires a number of methods like =getPassword=, =getUsername=, and =isEnabled=
 (see the [[http://docs.spring.io/autorepo/docs/spring-security/4.0.3.RELEASE/apidocs/org/springframework/security/core/userdetails/UserDetails.html][Spring docs]] for full details).
 
@@ -385,7 +402,8 @@ Now we have two views with a hierarchical relationship, such that =UserDetails=
 also includes all fields that that =ItemList= declares.  Next, we annotate each
 of the data fields to be in one of these two views, as shown above:  Username is
 part of the ItemList view, and the password and email are part of the
-UserDetails view.  
+UserDetails view.  We wil see below how you request these views on a
+controller. 
 
 
 ** The admin page
@@ -440,11 +458,16 @@ create two users, Navya and Dirk, both with password "secret".  Navya is an
 admin user, and Dirk is not.  
 
 If the authorization is successful, we can retrieve all users on the system and
-return a list of their names.  This is done via a =findAll=, a built-in JPA
+return a list of their names.  This is done via a =findAll= on the
+UserRepository. =findAll= is a built-in JPA
 function which does what it says on the can.  FindAll returns an iterable, from
 which we derive an iterator.  A lambda function is applied to each item with
 =forEachRemaining=, using a simple Java 8 lambda which takes a user =u= as an
-input and runs the =add= method on our result array.  
+input and runs the =add= method on our result array.  This is a little
+convoluted, partially because of Java design choices regarding iterators and
+iterables, and partially because we can only return a list of real items to the
+front end so we have to populate an arraylist with string values instead of
+passing the iterator or iterable. 
 
 If the authorization is not successful, we print an error on the console and
 return an empty list.  Ideally, the front end would check for this with an
@@ -473,14 +496,53 @@ The admin html page uses two =ng-repeat= statements to loop over users and
 items. It also uses two partials to render the users and items inside the
 loops, consistent with the pattern we used on the main page.  On the javascript
 side, =admin.js= does all the expected contacting of the backend and storing the
-information in variables on the scope.  The only interesting code is the
-=userQuery= array:  This is initialized to ={}= and filled with user details
-when requested via the button press.  The buttons are wired to
-=userDetails(username)= calls (with the username filled in) and the routine will
-contact the backend and populate the =userQuery= map.  On the html side, an
-=ng-if="userQuery[user]"= hides details that have not been retrieved yet: If
-there are no data yet, =userQuery[user]= will return undefined, which is falsy
-and will surpress the html fragment.
+information in variables on the scope.  
+
+The only interesting code is the =userQuery= array shown below: This is initialized to ={}=
+and filled with user details when requested via the button press.  The buttons
+are wired to =userDetails(username)= calls (with the username filled in) and the
+routine will contact the backend and populate the =userQuery= map.  On the html
+side (admin.html), an =ng-if="userQuery[user]"= hides details that have not been retrieved
+yet: If there are no data yet, =userQuery[user]= will return undefined, which is
+falsy and will surpress the html fragment.
+
+#+BEGIN_SRC javascript
+angular.module('admin', []).controller('ad1', function($scope, $http) {
+ // .. 
+    $scope.userQuery = {};
+    $scope.userDetails = function (username) {
+        $http.get('/resource/user/' + username + '/').then(
+            function (success) {
+                $scope.userQuery[success.data['username']] = success.data;
+            }
+        );
+    };
+#+END_SRC
+
+We have not defined a 'failure' branch in the javascript above.  This is
+consistent with my stance on this: I do not know how to substantially help the user if the
+request failed.  Clearly, the username must exist on the system because our
+usernames have been retrieved from the server earlier.  A failing call to
+=/resource/user/<id>= means that the server is down, the connection is very
+slow, or the user was since removed by another admin.  So there are three
+reasons, which I cannot distinguish between and none of them can be easily addressed
+by my user.
+
+What does the User Experience look like in case of failure?  If no result is
+returned, the user details will stay hidden (thanks to the =ng-if= in the
+admin.html).  The user will
+probably click on the username again, thinking that somehow their first click
+did not register.  If the request is successful the second time, they will not
+think much of it; if it isn't, they will think the button is somehow broken.  In
+either case, I don't think the user experience will be enhanced by flashing a
+message like "Sorry, but I cannot connect to the server right now, or maybe the
+user has been deleted? If you are on a  mobile device, move to an area with
+better reception.  If you are on a desktop, check your wifi connection or
+reinsert your IP cable. " This is adding unnecessary information to an already
+confusing situation, not a better User Experience.  It reminds me of this
+(infamous) Windows 8 screen: 
+
+[[http://4.bp.blogspot.com/-yQC-38xSdHA/VnmnQod6luI/AAAAAAAARJY/Z7vb8plv4Yo/s1600/win8-stuck-download-dialog.png]]
 
 
 ** Security settings
@@ -502,8 +564,8 @@ that do precisely what we outlined above:
 #+BEGIN_SRC 
 @Configuration
 @EnableWebMvcSecurity
-// only exactly one class should have this annotation, and its method (whose name does
-// not matter, will be executed to obtain the settings
+// only exactly one class should have this annotation and it should override 'configure'
+
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -598,7 +660,7 @@ At this point, we have a working login system:  The user can log in and we have 
 users (hardcoded into the application for now).  Stories belong to a user
 internally and only the stories owned by a user are visible to that user.  
 #+BEGIN_commit
- [[github:88e32599497bb00b6789c24e232f211352706291]]
+ [[github:37f70a12bd7e67e608dbb3572d86ebf5be2ca07f]]
 #+END_commit
 
 
@@ -755,11 +817,11 @@ Principal object, but a UserDetails.User object.  Keep this in mind if IntelliJ
 tells you that you are dealing with incompatible types.  We will encounter that
 'User' datatype again below. 
 
-This works and I actually have left it in the code of ListOfItemsController,
-even though it creates a (minimal) amount of overhead in the runtime.  For
-AdminController, it is worth exploring a better way as there are four endpoints
-that all need this treatment.  More importantly, in AdminControllerTest, all
-tests require authentication of some type.  
+Using =fixPrincipalForTest= we can make things work and I actually have left it
+in the code of ListOfItemsController, even though it creates a (minimal) amount
+of overhead in the runtime.  For AdminController, it is worth exploring a better
+way as there are four endpoints that all need this treatment.  More importantly,
+in AdminControllerTest, all tests require authentication of some type.
 
 On the Spring-Security channel of Slack, Rob Winch pointed me to the very
 obvious solution for this problem with principal:  We need to tell the =MockMvc=
@@ -782,9 +844,10 @@ security, which means that we cannot access any endpoints under =/resource/=
 without logging in.  For this reason, I stuck with the unsecured MockMvc and the
 fixPrincipalForTest hack in the ListOfItemsController.
 
-Once security is working in the MockMvc, Spring provides some goodies to test,
-for example, whether an unauthorized request indeed returns the correct response
-from the webserver.  You can see this in action in this test:
+Once security is working in the MockMvc, Spring provides some goodies for smooth
+testing. For example, we can easily test whether an unauthorized request indeed returns the correct
+response from the webserver.  You can see this in action in this test, which
+confirms that user details cannot be viewed when you have not logged in:
 #+BEGIN_SRC java
     @Test
     public void AdminShowUser_failsWithoutAuthentication() throws Exception {
@@ -830,14 +893,18 @@ but only the users own items for non-admin.
     }
 #+END_SRC
 
-Neither of these tests work until we put the `fixPrincipalForTest` in the
-corresponding endpoint.  We could have copied the helper function into the
-=AdminController= file, but this is not ideal as we would have created
-duplicated code.  Instead, we added the function as a static member function to
-a dedicated =Helper= class, which could also hold future small helper
-functions.  We will update the ListOfItemsController file at a later stage. 
+Note again that these tests will not work unless we use the fixPrincipalForTest
+function above (as we did for ListOfItemsController) or set up our MockMvc =mvc= to be aware of Spring
+Security (what we do here).  The reason for these two different approaches are
+historical and educational, but setting up the MockMvc with Spring Security also
+means that each test in AdminControllerTest has to be wired up with =MockUser=
+etc.  Because ListOfItemsController contains secured and unsecured content, it
+is easier to use the fixPrincipalForTest helper there.  (You could argue that it
+is not optimal and confusing to have secured and unsecured functions in
+ListOfItemsController; on the other hand it is good to keep related
+functionality together). 
 
-#+ *** TODO update the ListOfItemsController file at a later stage. 
+#+COMMENT  TODO update the ListOfItemsController file at a later stage. 
 
 The tests assume the setup created in 'SpringdoApplication.java': 2 users with
 5 items between them.  We could make more robust tests here by actually
@@ -849,7 +916,9 @@ not work here.
 
 *Lesson Learned*:  Although an array as the outer element is perfectly valid
 JSON, many tools expect a map as the outer element with named inner elements, or
-a 'data' key to hold the array.  
+a 'data' key to hold the array.   In other words:
+:  valid:      [ {"map": 1}, {"map": 2} ]
+:  expected:   { "data": [ {"map": 1}, {"map": 2} ] }
 
 While testing the =/who/= endpoint (which is not under the protected
 =/resource/= tree, ie. accessible by anybody), I discovered that although the
@@ -858,7 +927,7 @@ not really deal with the case of not being logged in.  Nice catch, and another
 good reason to write the tests first next time. 
 
 #+BEGIN_commit
- [[github:547750f148746c68c5ee7dedfd3f12f97f927018]]
+ [[github:840ec05dd68b8968d898c35e9ff5fd13ecf8c2fb]]
 #+END_commit
 
 
@@ -869,8 +938,18 @@ There is one issue about this setup that is particularly not satisfactory to me:
 We have a UserRepository, but the Spring Security framework is not using it to
 authenticate the users.  Instead, Spring has its own in-memory database of users
 and at startup, we copy all users from our repository into the Spring's
-database.  This is not only duplication of data, but it will also become quite
+database (this is done in SpringDoApplication.java, relevant code shown below).  
+This is not only duplication of data, but it will also become quite
 hard to manage once we add the ability to edit, add or remove users.  
+#+BEGIN_SRC java
+    @Override
+    public void run(String... strings) throws Exception {
+        User defaultUser = userRepository.save(User.AdminUser("Navya", "secret", "n@example.com"));
+        User secondUser = userRepository.save(new User("Dirk", "secret", "t@example.com"));
+        //  ..
+        userRepository.findAll().forEach(user -> inMemoryUserDetailsManager.createUser(user));
+#+END_SRC
+
 
 The underlying issue here is that Spring's concept of users more or less
 hardcoded into the framework.  Spring provides an interface =UserDetails= which
@@ -890,11 +969,11 @@ well discussed in this [[http://kielczewski.eu/2014/12/spring-boot-security-appl
 option, as our User class already has the necessary security 'cruft'.
 Personally, I would argue that it is good style to keep all the user data in one
 place, even if that means that we need to store some variables that we are
-pretty unlikely to ever use (and have ugly names to boot).  Regrettably, Spring
+pretty unlikely to ever use (and have ugly names to boot).  Regrettably for us, Spring
 Security requires these and, to me, the easiest way forward it to implement
 them.
 
-First, we create a new class the =UserManager=, which builds on top of the
+First, we create a new class the =UserManager=, which interacts with  the
 UserRepository:
 
 #+BEGIN_SRC java
@@ -914,9 +993,15 @@ these functions, which are required to have =UserDetail= parameters by the
 interface.  However, the repository does not know how to handle =UserDetails= so
 we have to cast them back to the =User= class they are.   I have used the full
 path on =User= in this code to disambiguate the many versions of the User class
-here. 
+here.   Below is the code for creating a user, the other methods are similar:
 
-In the setup of the security component (WebSecurityConfig), we need to initialize our new
+#+BEGIN_SRC java
+    public void createUser(UserDetails user) {
+        userRepository.save((io.pivotal.User) user);
+    }
+#+END_SRC
+
+In the setup of the security component (WebSecurityConfig.java), we need to initialize our new
 UserManager.  This setup is not particularly pretty, but apparently it is what
 Spring requires and it gives us the flexibility to specify the UserManager at
 runtime.  We can use this later on to only start up with our 2 users and 5
@@ -951,15 +1036,15 @@ things like adding, editing and removing users, but this is quite similar to the
 same operations on todo items.  It does make for some great practice to
 implement this.
 
-A related issue is that anybody can delete items at the moment, all they have to
+A related issue is that anybody can delete items at the moment if they are
+willing to create a custom url: All they have to
 do is to log in and then hit the delete endpoint with the todo item id.  A
 better implementation would only allow the owner of the item to delete it.
 
 
 
 #+BEGIN_commit
- [[github:5f8549588f04fc435e40c684e66848248175fe7a]]
- 8a6719b12176a48c905df8936a41f902ade84d9d
+ [[github:9a6ad767ba6b8cef920b25ff0a531857ac13eb0f]]
 #+END_commit
 
 
@@ -996,41 +1081,33 @@ http://stackoverflow.com/questions/29410009/spring-junit-datasource-autowiring
 * Resources
 
 
-A well-written blog post with a similar demonstration by [[http://kielczewski.eu/2014/12/spring-boot-security-application/][Bartosz Kielczewski]]
-
-Testing with CSRF protection on requires some extra work, see
-http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#test-mockmvc-csrf
-
-Blog entry on how to format security props:
- https://spring.io/blog/2013/07/11/spring-security-java-config-preview-readability/
-
-How to do a form post from angular is discussed on this StackOverflow [[http://stackoverflow.com/questions/11442632/how-can-i-post-data-as-form-data-instead-of-a-request-payload][post]].
-
-There are differences between Spring Boot 1.2 and 1.3.  These are apparently not
-included in the normal documentation but listed separately on a [[https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.3-Release-Notes][Github wiki page]].
-
-Spring Security 4.x is a big upgrade over the 3.x series.  However, this means
-the updates and migrations are not trivial either.  This [[http://docs.spring.io/spring-security/site/migrate/current/3-to-4/html5/migrate-3-to-4-jc.html#m3to4-role-prefixing][migration guide]] is very
-long but contains some good information.  They provide a sample project which
-gets upgraded from 3.x to 4.x, here is [[https://github.com/spring-projects/spring-security-migrate-3-to-4/compare/jc?expand=1][the diff between them]] (several hundred lines).
-
-
-In an excellent answer to this [[http://stackoverflow.com/questions/28123299/spring-boot-module-based-integration-testing/28141143#28141143][SO question]], Sam Brannen discusses various strategies for
-testing under Spring and Spring Boot and how you can disable security while
-testing. 
-
-I can recommend this very long post (actually seven posts combined into one tutorial;
-reading the Github =Readme.adoc= files may be easier) that
-deals with all kinds of aspects of Spring, AngularJS and security.  Part 2
-(subdirectory 'Single' in the github repo) helped me write the code for this
-episode.  Dave Syer starts out with the basics, then moves on to such topics as
-having security and content on different servers and using OAuth.  It is highly
-recommended reading if you want to dive much deeper into that area.
-https://spring.io/guides/tutorials/spring-security-and-angular-js/
-and https://github.com/dsyer/spring-security-angular/blob/master/overview.adoc.
-
-Full [[https://github.com/jayway/JsonPath][docs]], syntax and online test pages for the excellent JsonPath library (JayWay
-version). 
+- A well-written blog post with a similar demonstration by [[http://kielczewski.eu/2014/12/spring-boot-security-application/][Bartosz Kielczewski]],
+  this includes CSRF protection.
+- Testing with CSRF protection on requires some extra work, see
+  http://docs.spring.io/spring-security/site/docs/4.0.2.RELEASE/reference/htmlsingle/#test-mockmvc-csrf
+- Blog entry on how to format security props:
+  https://spring.io/blog/2013/07/11/spring-security-java-config-preview-readability/
+- How to do a form post from angular is discussed on this StackOverflow [[http://stackoverflow.com/questions/11442632/how-can-i-post-data-as-form-data-instead-of-a-request-payload][post]].
+- There are differences between Spring Boot 1.2 and 1.3.  These are apparently not
+  included in the normal documentation but listed separately on a [[https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.3-Release-Notes][Github wiki page]].
+- Spring Security 4.x is a big upgrade over the 3.x series.  However, this means
+  the updates and migrations are not trivial either.  This [[http://docs.spring.io/spring-security/site/migrate/current/3-to-4/html5/migrate-3-to-4-jc.html#m3to4-role-prefixing][migration guide]] is very
+  long but contains some good information.  They provide a sample project which
+  gets upgraded from 3.x to 4.x, here is [[https://github.com/spring-projects/spring-security-migrate-3-to-4/compare/jc?expand=1][the diff between them]] (several hundred lines).
+- In an excellent answer to this [[http://stackoverflow.com/questions/28123299/spring-boot-module-based-integration-testing/28141143#28141143][SO question]], Sam Brannen discusses various strategies for
+  testing under Spring and Spring Boot and how you can disable security while
+  testing. 
+- I can recommend this very long post (actually seven posts combined into one tutorial;
+  reading the Github =Readme.adoc= files may be easier) that
+  deals with all kinds of aspects of Spring, AngularJS and security.  Part 2
+  (subdirectory 'Single' in the github repo) helped me write the code for this
+  episode.  Dave Syer starts out with the basics, then moves on to such topics as
+  having security and content on different servers and using OAuth.  It is highly
+  recommended reading if you want to dive much deeper into that area.
+  https://spring.io/guides/tutorials/spring-security-and-angular-js/
+  and https://github.com/dsyer/spring-security-angular/blob/master/overview.adoc.
+- Full [[https://github.com/jayway/JsonPath][docs]], syntax and online test pages for the excellent JsonPath library
+  (JayWay version). 
 
 * Thanks
 
